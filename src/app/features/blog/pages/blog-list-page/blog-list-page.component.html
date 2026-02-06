@@ -1,0 +1,92 @@
+<!-- Blog List Page -->
+<div class="min-h-screen bg-gray-50 dark:bg-gray-900">
+  <!-- Header -->
+  <div class="bg-white dark:bg-gray-800 shadow-sm">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <div class="flex items-center justify-between">
+        <div>
+          <h1 class="text-3xl font-bold text-gray-900 dark:text-white">Blog</h1>
+          <p class="mt-2 text-gray-600 dark:text-gray-300">
+            Thoughts, tutorials, and insights on web development.
+          </p>
+        </div>
+        <a
+          routerLink="/"
+          class="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300
+                 font-medium inline-flex items-center gap-2 transition-colors"
+        >
+          <i class="fa-solid fa-arrow-left"></i>
+          Back to Portfolio
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tag Filters -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6" *ngIf="allTags.length > 0">
+    <div class="flex flex-wrap gap-2">
+      <button
+        (click)="filterByTag(null)"
+        [class]="selectedTag === null
+          ? 'px-4 py-2 rounded-full text-sm font-medium bg-blue-600 text-white'
+          : 'px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'"
+      >
+        All
+      </button>
+      <button
+        *ngFor="let tag of allTags"
+        (click)="filterByTag(tag)"
+        [class]="selectedTag === tag
+          ? 'px-4 py-2 rounded-full text-sm font-medium bg-blue-600 text-white'
+          : 'px-4 py-2 rounded-full text-sm font-medium bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border border-gray-200 dark:border-gray-600 hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors'"
+      >
+        {{ tag }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="isLoading" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <app-loading-spinner message="Loading blog posts..."></app-loading-spinner>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="errorMessage" class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+    <div class="text-center">
+      <i class="fa-solid fa-exclamation-triangle text-4xl text-red-500 mb-4"></i>
+      <p class="text-gray-600 dark:text-gray-300">{{ errorMessage }}</p>
+      <button
+        pButton
+        label="Retry"
+        icon="fa-solid fa-rotate-right"
+        class="mt-4"
+        (click)="loadBlogs()"
+      >Retry</button>
+    </div>
+  </div>
+
+  <!-- Blog Grid -->
+  <div
+    *ngIf="!isLoading && !errorMessage"
+    class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6"
+  >
+    <!-- No posts message -->
+    <div *ngIf="filteredBlogs.length === 0" class="text-center py-12">
+      <i class="fa-solid fa-newspaper text-4xl text-gray-400 mb-4"></i>
+      <p class="text-gray-600 dark:text-gray-300 text-lg">
+        No blog posts found{{ selectedTag ? ' for tag "' + selectedTag + '"' : '' }}.
+      </p>
+    </div>
+
+    <!-- Blog Cards Grid -->
+    <div
+      *ngIf="filteredBlogs.length > 0"
+      class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8"
+    >
+      <app-blog-card
+        *ngFor="let blog of filteredBlogs"
+        [blog]="blog"
+      ></app-blog-card>
+    </div>
+  </div>
+</div>

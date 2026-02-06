@@ -1,0 +1,22 @@
+<section id="skills" class="py-20 px-4">
+  <div class="max-w-7xl mx-auto">
+    <app-section-header title="Skills & Expertise" subtitle="Technologies I work with"></app-section-header>
+
+    <!-- Category Filter -->
+    <div class="flex justify-center flex-wrap gap-2 mb-12">
+      <p-button *ngFor="let cat of categories"
+                [label]="cat.label"
+                [severity]="selectedCategory === cat.value ? 'primary' : 'secondary'"
+                [outlined]="selectedCategory !== cat.value"
+                [rounded]="true"
+                size="small"
+                (click)="onCategoryChange(cat.value)">
+      </p-button>
+    </div>
+
+    <!-- Skills Grid -->
+    <div *ngIf="skills$ | async as skills" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      <app-skill-card *ngFor="let skill of filterSkills(skills)" [skill]="skill"></app-skill-card>
+    </div>
+  </div>
+</section>

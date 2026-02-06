@@ -1,0 +1,259 @@
+<div class="flex min-h-screen bg-gray-50 dark:bg-gray-900">
+  <!-- Sidebar -->
+  <app-admin-sidebar></app-admin-sidebar>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto">
+    <app-password-warning-banner></app-password-warning-banner>
+    <div class="p-6 lg:p-10">
+    <!-- Header -->
+    <div class="flex items-center justify-between mb-8">
+      <div>
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white">Manage Blog</h1>
+        <p class="mt-1 text-sm text-gray-500 dark:text-gray-400">Create, edit, and manage your blog posts.</p>
+      </div>
+      <button
+        *ngIf="!isEditing"
+        (click)="openNewBlogForm()"
+        class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-4 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-900 transition-colors"
+      >
+        <i class="fa-solid fa-plus"></i>
+        New Post
+      </button>
+    </div>
+
+    <!-- Blog Editor Form -->
+    <div
+      *ngIf="isEditing"
+      class="mb-8 rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-6 shadow-sm"
+    >
+      <h2 class="text-lg font-semibold text-gray-900 dark:text-white mb-6">
+        {{ selectedBlog ? 'Edit Post' : 'New Post' }}
+      </h2>
+
+      <form [formGroup]="blogForm" (ngSubmit)="saveBlog()" class="space-y-5">
+        <!-- Title -->
+        <div>
+          <label for="blog-title" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Title <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="blog-title"
+            type="text"
+            formControlName="title"
+            (input)="onTitleChange()"
+            placeholder="Enter blog post title"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors"
+          />
+          <p
+            *ngIf="blogForm.get('title')?.touched && blogForm.get('title')?.hasError('required')"
+            class="mt-1 text-xs text-red-500"
+          >
+            Title is required.
+          </p>
+        </div>
+
+        <!-- Slug -->
+        <div>
+          <label for="blog-slug" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Slug <span class="text-red-500">*</span>
+          </label>
+          <input
+            id="blog-slug"
+            type="text"
+            formControlName="slug"
+            placeholder="auto-generated-slug"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-gray-50 dark:bg-gray-600 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors"
+          />
+          <p
+            *ngIf="blogForm.get('slug')?.touched && blogForm.get('slug')?.hasError('required')"
+            class="mt-1 text-xs text-red-500"
+          >
+            Slug is required.
+          </p>
+        </div>
+
+        <!-- Excerpt -->
+        <div>
+          <label for="blog-excerpt" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Excerpt
+          </label>
+          <textarea
+            id="blog-excerpt"
+            formControlName="excerpt"
+            rows="2"
+            placeholder="A brief summary of your post"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors resize-y"
+          ></textarea>
+        </div>
+
+        <!-- Content -->
+        <div>
+          <label for="blog-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Content (HTML)
+          </label>
+          <textarea
+            id="blog-content"
+            formControlName="content"
+            rows="10"
+            placeholder="Write your blog post content in HTML..."
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 font-mono focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors resize-y"
+          ></textarea>
+        </div>
+
+        <!-- Cover Image URL -->
+        <div>
+          <label for="blog-cover" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Cover Image URL
+          </label>
+          <input
+            id="blog-cover"
+            type="text"
+            formControlName="coverImage"
+            placeholder="https://example.com/image.jpg"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors"
+          />
+        </div>
+
+        <!-- Tags -->
+        <div>
+          <label for="blog-tags" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Tags
+          </label>
+          <input
+            id="blog-tags"
+            type="text"
+            formControlName="tags"
+            placeholder="Angular, TypeScript, Web Development"
+            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors"
+          />
+          <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Separate tags with commas.</p>
+        </div>
+
+        <!-- Is Published -->
+        <div class="flex items-center gap-3">
+          <input
+            id="blog-published"
+            type="checkbox"
+            formControlName="published"
+            class="h-4 w-4 rounded border-gray-300 dark:border-gray-600 text-indigo-600 focus:ring-indigo-500 dark:focus:ring-indigo-400 dark:bg-gray-700"
+          />
+          <label for="blog-published" class="text-sm font-medium text-gray-700 dark:text-gray-300">
+            Publish immediately
+          </label>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-3 pt-2">
+          <button
+            type="submit"
+            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
+          >
+            <i class="fa-solid fa-check"></i>
+            {{ selectedBlog ? 'Update Post' : 'Create Post' }}
+          </button>
+          <button
+            type="button"
+            (click)="cancelEdit()"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
+          >
+            Cancel
+          </button>
+        </div>
+      </form>
+    </div>
+
+    <!-- Blog List -->
+    <div class="rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 shadow-sm overflow-hidden">
+      <div class="overflow-x-auto">
+        <table class="w-full text-left text-sm">
+          <thead class="border-b border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-800/50">
+            <tr>
+              <th class="px-6 py-3.5 font-semibold text-gray-900 dark:text-white">Title</th>
+              <th class="px-6 py-3.5 font-semibold text-gray-900 dark:text-white">Status</th>
+              <th class="px-6 py-3.5 font-semibold text-gray-900 dark:text-white">Tags</th>
+              <th class="px-6 py-3.5 font-semibold text-gray-900 dark:text-white">Date</th>
+              <th class="px-6 py-3.5 font-semibold text-gray-900 dark:text-white text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody class="divide-y divide-gray-200 dark:divide-gray-700">
+            <tr
+              *ngFor="let blog of blogs"
+              class="hover:bg-gray-50 dark:hover:bg-gray-700/50 transition-colors"
+            >
+              <!-- Title & Slug -->
+              <td class="px-6 py-4">
+                <p class="font-medium text-gray-900 dark:text-white">{{ blog.title }}</p>
+                <p class="mt-0.5 text-xs text-gray-400 dark:text-gray-500">/{{ blog.slug }}</p>
+              </td>
+
+              <!-- Status Badge -->
+              <td class="px-6 py-4">
+                <span
+                  *ngIf="blog.published"
+                  class="inline-flex items-center rounded-full bg-green-100 dark:bg-green-900/30 px-2.5 py-0.5 text-xs font-medium text-green-700 dark:text-green-400"
+                >
+                  Published
+                </span>
+                <span
+                  *ngIf="!blog.published"
+                  class="inline-flex items-center rounded-full bg-yellow-100 dark:bg-yellow-900/30 px-2.5 py-0.5 text-xs font-medium text-yellow-700 dark:text-yellow-400"
+                >
+                  Draft
+                </span>
+              </td>
+
+              <!-- Tags -->
+              <td class="px-6 py-4">
+                <div class="flex flex-wrap gap-1">
+                  <span
+                    *ngFor="let tag of blog.tags"
+                    class="inline-flex rounded-md bg-indigo-50 dark:bg-indigo-900/20 px-2 py-0.5 text-xs font-medium text-indigo-600 dark:text-indigo-400"
+                  >
+                    {{ tag }}
+                  </span>
+                </div>
+              </td>
+
+              <!-- Date -->
+              <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
+                {{ blog.createdAt | date:'mediumDate' }}
+              </td>
+
+              <!-- Actions -->
+              <td class="px-6 py-4 text-right">
+                <div class="inline-flex items-center gap-2">
+                  <button
+                    (click)="editBlog(blog)"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-3 py-1.5 text-xs font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors"
+                  >
+                    <i class="fa-solid fa-pen-to-square"></i>
+                    Edit
+                  </button>
+                  <button
+                    (click)="deleteBlog(blog.id)"
+                    class="inline-flex items-center gap-1.5 rounded-lg border border-red-200 dark:border-red-800 bg-white dark:bg-gray-700 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                    Delete
+                  </button>
+                </div>
+              </td>
+            </tr>
+
+            <!-- Empty State -->
+            <tr *ngIf="blogs.length === 0">
+              <td colspan="5" class="px-6 py-12 text-center">
+                <div class="flex flex-col items-center gap-3">
+                  <i class="fa-solid fa-file-pen text-4xl text-gray-300 dark:text-gray-600"></i>
+                  <p class="text-sm text-gray-500 dark:text-gray-400">No blog posts yet. Click "New Post" to create your first one.</p>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    </div>
+  </main>
+</div>

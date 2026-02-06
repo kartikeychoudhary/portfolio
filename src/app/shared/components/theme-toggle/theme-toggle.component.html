@@ -1,0 +1,5 @@
+<p-button
+  [icon]="(themeService.isDark$ | async) ? 'pi pi-sun' : 'pi pi-moon'"
+  [rounded]="true"
+  (click)="toggle()">
+</p-button>

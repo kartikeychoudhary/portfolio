@@ -1,0 +1,47 @@
+<section id="contact" class="py-20 px-4 bg-surface-ground">
+  <div class="max-w-2xl mx-auto">
+    <app-section-header title="Get In Touch" subtitle="Let's work together"></app-section-header>
+
+    <!-- Success Message -->
+    <div *ngIf="submitSuccess" class="mb-6 p-4 bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200 rounded-lg text-center">
+      Thank you for your message! I'll get back to you soon.
+    </div>
+
+    <!-- Error Message -->
+    <div *ngIf="submitError" class="mb-6 p-4 bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-200 rounded-lg text-center">
+      Something went wrong. Please try again later.
+    </div>
+
+    <form [formGroup]="contactForm" (ngSubmit)="onSubmit()" class="space-y-6">
+      <div>
+        <label for="name" class="block text-sm font-medium mb-1">Name</label>
+        <input pInputText id="name" formControlName="name" class="w-full" placeholder="Your name">
+        <small *ngIf="isFieldInvalid('name')" class="text-red-500">Name is required</small>
+      </div>
+
+      <div>
+        <label for="email" class="block text-sm font-medium mb-1">Email</label>
+        <input pInputText id="email" formControlName="email" class="w-full" placeholder="your@email.com">
+        <small *ngIf="isFieldInvalid('email')" class="text-red-500">Valid email is required</small>
+      </div>
+
+      <div>
+        <label for="subject" class="block text-sm font-medium mb-1">Subject</label>
+        <input pInputText id="subject" formControlName="subject" class="w-full" placeholder="Subject">
+        <small *ngIf="isFieldInvalid('subject')" class="text-red-500">Subject is required</small>
+      </div>
+
+      <div>
+        <label for="message" class="block text-sm font-medium mb-1">Message</label>
+        <textarea pInputTextarea id="message" formControlName="message" [rows]="5" class="w-full" placeholder="Your message..."></textarea>
+        <small *ngIf="isFieldInvalid('message')" class="text-red-500">Message is required</small>
+      </div>
+
+      <div class="text-center">
+        <p-button type="submit" label="Send Message" icon="pi pi-send"
+                  [loading]="isSubmitting" [disabled]="isSubmitting">
+        </p-button>
+      </div>
+    </form>
+  </div>
+</section>

@@ -1,0 +1,8 @@
+.settings-page {
+  min-height: 100vh;
+  background-color: #f9fafb;
+
+  @media (prefers-color-scheme: dark) {
+    background-color: #111827;
+  }
+}

@@ -1,0 +1,35 @@
+<div class="bg-surface-card border border-surface-border rounded-xl overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
+  <!-- Thumbnail -->
+  <div class="relative overflow-hidden h-48">
+    <img [src]="project.thumbnailUrl" [alt]="project.title"
+         class="w-full h-full object-cover transition-transform duration-300 hover:scale-110">
+    <span *ngIf="project.featured"
+          class="absolute top-3 right-3 px-3 py-1 text-xs font-semibold rounded-full bg-yellow-400 text-yellow-900">
+      Featured
+    </span>
+  </div>
+
+  <!-- Content -->
+  <div class="p-6">
+    <h3 class="text-xl font-bold mb-2">{{ project.title }}</h3>
+    <p class="text-sm mb-4" [style.color]="'var(--p-text-muted-color)'">{{ project.description }}</p>
+
+    <!-- Technologies -->
+    <div class="flex flex-wrap gap-2 mb-4">
+      <span *ngFor="let tech of project.technologies"
+            class="px-2 py-1 text-xs rounded-full bg-blue-100 text-blue-800 dark:bg-blue-900 dark:text-blue-200">
+        {{ tech }}
+      </span>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="flex gap-3">
+      <a *ngIf="project.liveUrl" [href]="project.liveUrl" target="_blank" rel="noopener noreferrer">
+        <p-button label="Live Demo" icon="pi pi-external-link" size="small" [outlined]="true"></p-button>
+      </a>
+      <a *ngIf="project.repoUrl" [href]="project.repoUrl" target="_blank" rel="noopener noreferrer">
+        <p-button label="Source Code" icon="pi pi-github" size="small" severity="secondary" [outlined]="true"></p-button>
+      </a>
+    </div>
+  </div>
+</div>

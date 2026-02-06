@@ -1,0 +1,5 @@
+<div class="bg-surface-card border border-surface-border rounded-xl p-6 text-center hover:shadow-lg transition-shadow duration-300">
+  <i [class]="skill.icon" class="text-4xl mb-4 block" [style.color]="'var(--p-primary-color)'"></i>
+  <h3 class="text-lg font-semibold mb-3">{{ skill.name }}</h3>
+  <p-progressBar [value]="skill.proficiency" [showValue]="true" class="w-full"></p-progressBar>
+</div>

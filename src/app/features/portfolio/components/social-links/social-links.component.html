@@ -1,0 +1,10 @@
+<div class="flex justify-center gap-4">
+  <a *ngFor="let link of socialLinks"
+     [href]="link.url"
+     target="_blank"
+     rel="noopener noreferrer"
+     [title]="link.label"
+     class="w-10 h-10 flex items-center justify-center rounded-full border border-surface-border hover:bg-primary hover:text-white hover:border-primary transition-all duration-300">
+    <i [class]="link.icon"></i>
+  </a>
+</div>

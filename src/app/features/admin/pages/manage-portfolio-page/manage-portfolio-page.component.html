@@ -1,0 +1,669 @@
+<div class="flex min-h-screen bg-gray-100 dark:bg-gray-900">
+  <!-- Sidebar -->
+  <app-admin-sidebar></app-admin-sidebar>
+
+  <!-- Main Content -->
+  <main class="flex-1 overflow-y-auto">
+    <app-password-warning-banner></app-password-warning-banner>
+    <div class="p-6 lg:p-8">
+    <!-- Page Header -->
+    <div class="mb-8">
+      <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Manage Portfolio</h1>
+      <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        Update your profile, skills, experiences, and projects.
+      </p>
+    </div>
+
+    <!-- Tab Navigation -->
+    <div class="flex gap-1 mb-6 border-b border-gray-200 dark:border-gray-700">
+      <button
+        (click)="switchTab('profile')"
+        [class.border-indigo-600]="activeTab === 'profile'"
+        [class.text-indigo-600]="activeTab === 'profile'"
+        [class.dark\:border-indigo-400]="activeTab === 'profile'"
+        [class.dark\:text-indigo-400]="activeTab === 'profile'"
+        [class.border-transparent]="activeTab !== 'profile'"
+        [class.text-gray-500]="activeTab !== 'profile'"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+      >
+        <i class="fa-solid fa-user mr-2"></i>Profile
+      </button>
+      <button
+        (click)="switchTab('skills')"
+        [class.border-indigo-600]="activeTab === 'skills'"
+        [class.text-indigo-600]="activeTab === 'skills'"
+        [class.dark\:border-indigo-400]="activeTab === 'skills'"
+        [class.dark\:text-indigo-400]="activeTab === 'skills'"
+        [class.border-transparent]="activeTab !== 'skills'"
+        [class.text-gray-500]="activeTab !== 'skills'"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+      >
+        <i class="fa-solid fa-code mr-2"></i>Skills
+      </button>
+      <button
+        (click)="switchTab('experiences')"
+        [class.border-indigo-600]="activeTab === 'experiences'"
+        [class.text-indigo-600]="activeTab === 'experiences'"
+        [class.dark\:border-indigo-400]="activeTab === 'experiences'"
+        [class.dark\:text-indigo-400]="activeTab === 'experiences'"
+        [class.border-transparent]="activeTab !== 'experiences'"
+        [class.text-gray-500]="activeTab !== 'experiences'"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+      >
+        <i class="fa-solid fa-briefcase mr-2"></i>Experiences
+      </button>
+      <button
+        (click)="switchTab('projects')"
+        [class.border-indigo-600]="activeTab === 'projects'"
+        [class.text-indigo-600]="activeTab === 'projects'"
+        [class.dark\:border-indigo-400]="activeTab === 'projects'"
+        [class.dark\:text-indigo-400]="activeTab === 'projects'"
+        [class.border-transparent]="activeTab !== 'projects'"
+        [class.text-gray-500]="activeTab !== 'projects'"
+        class="px-4 py-2.5 text-sm font-medium border-b-2 transition-colors hover:text-indigo-600 dark:hover:text-indigo-400"
+      >
+        <i class="fa-solid fa-diagram-project mr-2"></i>Projects
+      </button>
+    </div>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PROFILE TAB                                            -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section *ngIf="activeTab === 'profile'">
+      <div class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white mb-5">Profile Information</h2>
+
+        <app-loading-spinner *ngIf="profileLoading"></app-loading-spinner>
+
+        <form *ngIf="!profileLoading" [formGroup]="profileForm" (ngSubmit)="saveProfile()" class="flex flex-col gap-5">
+          <!-- Full Name -->
+          <div class="flex flex-col gap-1">
+            <label for="fullName" class="text-sm font-medium text-gray-700 dark:text-gray-300">Full Name</label>
+            <input
+              id="fullName"
+              type="text"
+              pInputText
+              formControlName="fullName"
+              placeholder="Enter full name"
+              class="w-full"
+            />
+            <small
+              *ngIf="profileForm.get('fullName')?.touched && profileForm.get('fullName')?.hasError('required')"
+              class="text-red-500 dark:text-red-400 text-xs"
+            >
+              Full name is required.
+            </small>
+          </div>
+
+          <!-- Title -->
+          <div class="flex flex-col gap-1">
+            <label for="profileTitle" class="text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+            <input
+              id="profileTitle"
+              type="text"
+              pInputText
+              formControlName="title"
+              placeholder="e.g. Full Stack Developer"
+              class="w-full"
+            />
+            <small
+              *ngIf="profileForm.get('title')?.touched && profileForm.get('title')?.hasError('required')"
+              class="text-red-500 dark:text-red-400 text-xs"
+            >
+              Title is required.
+            </small>
+          </div>
+
+          <!-- Tagline -->
+          <div class="flex flex-col gap-1">
+            <label for="tagline" class="text-sm font-medium text-gray-700 dark:text-gray-300">Tagline</label>
+            <input
+              id="tagline"
+              type="text"
+              pInputText
+              formControlName="tagline"
+              placeholder="A short tagline about yourself"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Bio -->
+          <div class="flex flex-col gap-1">
+            <label for="bio" class="text-sm font-medium text-gray-700 dark:text-gray-300">Bio</label>
+            <textarea
+              id="bio"
+              formControlName="bio"
+              rows="5"
+              placeholder="Write about yourself (HTML allowed)"
+              class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            ></textarea>
+          </div>
+
+          <!-- Avatar URL -->
+          <div class="flex flex-col gap-1">
+            <label for="avatarUrl" class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatar URL</label>
+            <input
+              id="avatarUrl"
+              type="text"
+              pInputText
+              formControlName="avatarUrl"
+              placeholder="https://example.com/avatar.jpg"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Resume URL -->
+          <div class="flex flex-col gap-1">
+            <label for="resumeUrl" class="text-sm font-medium text-gray-700 dark:text-gray-300">Resume URL</label>
+            <input
+              id="resumeUrl"
+              type="text"
+              pInputText
+              formControlName="resumeUrl"
+              placeholder="https://example.com/resume.pdf"
+              class="w-full"
+            />
+          </div>
+
+          <!-- Save Button -->
+          <div class="flex justify-end pt-2">
+            <p-button
+              type="submit"
+              label="Save Profile"
+              icon="fa-solid fa-floppy-disk"
+              [disabled]="profileSaving"
+              [loading]="profileSaving"
+            ></p-button>
+          </div>
+        </form>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- SKILLS TAB                                             -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section *ngIf="activeTab === 'skills'">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Skills</h2>
+        <p-button
+          label="Add Skill"
+          icon="fa-solid fa-plus"
+          (onClick)="openAddSkill()"
+          [disabled]="showSkillForm"
+        ></p-button>
+      </div>
+
+      <app-loading-spinner *ngIf="skillsLoading"></app-loading-spinner>
+
+      <!-- Skill Form (Add/Edit) -->
+      <div
+        *ngIf="showSkillForm"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-5"
+      >
+        <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-4">
+          {{ editingSkill ? 'Edit Skill' : 'Add Skill' }}
+        </h3>
+        <form [formGroup]="skillForm" (ngSubmit)="saveSkill()" class="flex flex-col gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Name -->
+            <div class="flex flex-col gap-1">
+              <label for="skillName" class="text-sm font-medium text-gray-700 dark:text-gray-300">Name</label>
+              <input id="skillName" type="text" pInputText formControlName="name" placeholder="e.g. Angular" class="w-full" />
+              <small
+                *ngIf="skillForm.get('name')?.touched && skillForm.get('name')?.hasError('required')"
+                class="text-red-500 dark:text-red-400 text-xs"
+              >
+                Skill name is required.
+              </small>
+            </div>
+            <!-- Icon -->
+            <div class="flex flex-col gap-1">
+              <label for="skillIcon" class="text-sm font-medium text-gray-700 dark:text-gray-300">Icon Class</label>
+              <input id="skillIcon" type="text" pInputText formControlName="icon" placeholder="fa-brands fa-angular" class="w-full" />
+            </div>
+            <!-- Category -->
+            <div class="flex flex-col gap-1">
+              <label for="skillCategory" class="text-sm font-medium text-gray-700 dark:text-gray-300">Category</label>
+              <select
+                id="skillCategory"
+                formControlName="category"
+                class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              >
+                <option *ngFor="let cat of skillCategories" [value]="cat">{{ cat }}</option>
+              </select>
+            </div>
+            <!-- Proficiency -->
+            <div class="flex flex-col gap-1">
+              <label for="skillProficiency" class="text-sm font-medium text-gray-700 dark:text-gray-300">Proficiency (1-100)</label>
+              <input id="skillProficiency" type="number" pInputText formControlName="proficiency" min="1" max="100" class="w-full" />
+            </div>
+            <!-- Sort Order -->
+            <div class="flex flex-col gap-1">
+              <label for="skillSortOrder" class="text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
+              <input id="skillSortOrder" type="number" pInputText formControlName="sortOrder" class="w-full" />
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 pt-2">
+            <p-button label="Cancel" severity="secondary" (onClick)="cancelSkillForm()"></p-button>
+            <p-button
+              type="submit"
+              [label]="editingSkill ? 'Update Skill' : 'Create Skill'"
+              icon="fa-solid fa-floppy-disk"
+              [disabled]="skillSaving"
+              [loading]="skillSaving"
+            ></p-button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Skills List -->
+      <div *ngIf="!skillsLoading && skills.length === 0 && !showSkillForm" class="text-center py-10 text-gray-400 dark:text-gray-500">
+        No skills yet. Click "Add Skill" to get started.
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          *ngFor="let skill of skills"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-4 flex flex-col gap-3"
+        >
+          <div class="flex items-center gap-3">
+            <i [class]="skill.icon" class="text-2xl text-indigo-600 dark:text-indigo-400"></i>
+            <div class="flex-1 min-w-0">
+              <h4 class="text-sm font-semibold text-gray-800 dark:text-white truncate">{{ skill.name }}</h4>
+              <span class="text-xs text-gray-500 dark:text-gray-400 capitalize">{{ skill.category }}</span>
+            </div>
+          </div>
+          <!-- Proficiency Bar -->
+          <div class="w-full bg-gray-200 dark:bg-gray-700 rounded-full h-2">
+            <div
+              class="bg-indigo-600 dark:bg-indigo-400 h-2 rounded-full transition-all"
+              [style.width.%]="skill.proficiency"
+            ></div>
+          </div>
+          <span class="text-xs text-gray-500 dark:text-gray-400">{{ skill.proficiency }}% proficiency</span>
+          <!-- Actions -->
+          <div class="flex justify-end gap-2 mt-auto">
+            <button
+              (click)="openEditSkill(skill)"
+              class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+              pTooltip="Edit"
+            >
+              <i class="fa-solid fa-pen-to-square"></i>
+            </button>
+            <button
+              (click)="deleteSkill(skill)"
+              class="text-sm text-red-600 dark:text-red-400 hover:underline"
+              pTooltip="Delete"
+            >
+              <i class="fa-solid fa-trash"></i>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- EXPERIENCES TAB                                        -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section *ngIf="activeTab === 'experiences'">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Experiences</h2>
+        <p-button
+          label="Add Experience"
+          icon="fa-solid fa-plus"
+          (onClick)="openAddExperience()"
+          [disabled]="showExperienceForm"
+        ></p-button>
+      </div>
+
+      <app-loading-spinner *ngIf="experiencesLoading"></app-loading-spinner>
+
+      <!-- Experience Form (Add/Edit) -->
+      <div
+        *ngIf="showExperienceForm"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-5"
+      >
+        <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-4">
+          {{ editingExperience ? 'Edit Experience' : 'Add Experience' }}
+        </h3>
+        <form [formGroup]="experienceForm" (ngSubmit)="saveExperience()" class="flex flex-col gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Company -->
+            <div class="flex flex-col gap-1">
+              <label for="expCompany" class="text-sm font-medium text-gray-700 dark:text-gray-300">Company</label>
+              <input id="expCompany" type="text" pInputText formControlName="company" placeholder="Company name" class="w-full" />
+              <small
+                *ngIf="experienceForm.get('company')?.touched && experienceForm.get('company')?.hasError('required')"
+                class="text-red-500 dark:text-red-400 text-xs"
+              >
+                Company is required.
+              </small>
+            </div>
+            <!-- Company Logo -->
+            <div class="flex flex-col gap-1">
+              <label for="expLogo" class="text-sm font-medium text-gray-700 dark:text-gray-300">Company Logo URL</label>
+              <input id="expLogo" type="text" pInputText formControlName="companyLogo" placeholder="https://..." class="w-full" />
+            </div>
+            <!-- Role -->
+            <div class="flex flex-col gap-1">
+              <label for="expRole" class="text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
+              <input id="expRole" type="text" pInputText formControlName="role" placeholder="e.g. Senior Developer" class="w-full" />
+              <small
+                *ngIf="experienceForm.get('role')?.touched && experienceForm.get('role')?.hasError('required')"
+                class="text-red-500 dark:text-red-400 text-xs"
+              >
+                Role is required.
+              </small>
+            </div>
+            <!-- Location -->
+            <div class="flex flex-col gap-1">
+              <label for="expLocation" class="text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+              <input id="expLocation" type="text" pInputText formControlName="location" placeholder="e.g. Remote" class="w-full" />
+            </div>
+            <!-- Start Date -->
+            <div class="flex flex-col gap-1">
+              <label for="expStartDate" class="text-sm font-medium text-gray-700 dark:text-gray-300">Start Date</label>
+              <input id="expStartDate" type="date" pInputText formControlName="startDate" class="w-full" />
+              <small
+                *ngIf="experienceForm.get('startDate')?.touched && experienceForm.get('startDate')?.hasError('required')"
+                class="text-red-500 dark:text-red-400 text-xs"
+              >
+                Start date is required.
+              </small>
+            </div>
+            <!-- End Date -->
+            <div class="flex flex-col gap-1">
+              <label for="expEndDate" class="text-sm font-medium text-gray-700 dark:text-gray-300">End Date</label>
+              <input
+                id="expEndDate"
+                type="date"
+                pInputText
+                formControlName="endDate"
+                class="w-full"
+                [attr.disabled]="experienceForm.get('isCurrent')?.value ? '' : null"
+              />
+            </div>
+          </div>
+          <!-- Is Current -->
+          <div class="flex items-center gap-2">
+            <input id="expIsCurrent" type="checkbox" formControlName="isCurrent" class="rounded text-indigo-600" />
+            <label for="expIsCurrent" class="text-sm text-gray-700 dark:text-gray-300">Currently working here</label>
+          </div>
+          <!-- Description -->
+          <div class="flex flex-col gap-1">
+            <label for="expDescription" class="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+            <textarea
+              id="expDescription"
+              formControlName="description"
+              rows="4"
+              placeholder="Describe your role and responsibilities (HTML allowed)"
+              class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            ></textarea>
+          </div>
+          <!-- Technologies -->
+          <div class="flex flex-col gap-1">
+            <label for="expTechnologies" class="text-sm font-medium text-gray-700 dark:text-gray-300">Technologies (comma separated)</label>
+            <input id="expTechnologies" type="text" pInputText formControlName="technologies" placeholder="Angular, TypeScript, Node.js" class="w-full" />
+          </div>
+          <!-- Sort Order -->
+          <div class="flex flex-col gap-1 max-w-xs">
+            <label for="expSortOrder" class="text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
+            <input id="expSortOrder" type="number" pInputText formControlName="sortOrder" class="w-full" />
+          </div>
+          <div class="flex justify-end gap-3 pt-2">
+            <p-button label="Cancel" severity="secondary" (onClick)="cancelExperienceForm()"></p-button>
+            <p-button
+              type="submit"
+              [label]="editingExperience ? 'Update Experience' : 'Create Experience'"
+              icon="fa-solid fa-floppy-disk"
+              [disabled]="experienceSaving"
+              [loading]="experienceSaving"
+            ></p-button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Experiences List -->
+      <div *ngIf="!experiencesLoading && experiences.length === 0 && !showExperienceForm" class="text-center py-10 text-gray-400 dark:text-gray-500">
+        No experiences yet. Click "Add Experience" to get started.
+      </div>
+
+      <div class="flex flex-col gap-4">
+        <div
+          *ngFor="let exp of experiences"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-5"
+        >
+          <div class="flex items-start justify-between gap-4">
+            <div class="flex items-start gap-4 min-w-0">
+              <div
+                *ngIf="exp.companyLogo"
+                class="w-12 h-12 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center overflow-hidden flex-shrink-0"
+              >
+                <img [src]="exp.companyLogo" [alt]="exp.company" class="w-full h-full object-contain" />
+              </div>
+              <div
+                *ngIf="!exp.companyLogo"
+                class="w-12 h-12 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 flex items-center justify-center flex-shrink-0"
+              >
+                <i class="fa-solid fa-building text-indigo-600 dark:text-indigo-400"></i>
+              </div>
+              <div class="min-w-0">
+                <h4 class="text-sm font-semibold text-gray-800 dark:text-white">{{ exp.role }}</h4>
+                <p class="text-sm text-gray-600 dark:text-gray-300">{{ exp.company }}</p>
+                <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                  {{ exp.startDate }} - {{ exp.isCurrent ? 'Present' : exp.endDate }}
+                  <span *ngIf="exp.location" class="ml-2">| {{ exp.location }}</span>
+                </p>
+                <div *ngIf="exp.technologies.length" class="flex flex-wrap gap-1.5 mt-2">
+                  <span
+                    *ngFor="let tech of exp.technologies"
+                    class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full"
+                  >
+                    {{ tech }}
+                  </span>
+                </div>
+              </div>
+            </div>
+            <div class="flex gap-2 flex-shrink-0">
+              <button
+                (click)="openEditExperience(exp)"
+                class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                pTooltip="Edit"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button
+                (click)="deleteExperience(exp)"
+                class="text-sm text-red-600 dark:text-red-400 hover:underline"
+                pTooltip="Delete"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <!-- PROJECTS TAB                                           -->
+    <!-- ═══════════════════════════════════════════════════════ -->
+    <section *ngIf="activeTab === 'projects'">
+      <div class="flex items-center justify-between mb-5">
+        <h2 class="text-lg font-semibold text-gray-800 dark:text-white">Projects</h2>
+        <p-button
+          label="Add Project"
+          icon="fa-solid fa-plus"
+          (onClick)="openAddProject()"
+          [disabled]="showProjectForm"
+        ></p-button>
+      </div>
+
+      <app-loading-spinner *ngIf="projectsLoading"></app-loading-spinner>
+
+      <!-- Project Form (Add/Edit) -->
+      <div
+        *ngIf="showProjectForm"
+        class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 p-6 mb-5"
+      >
+        <h3 class="text-base font-semibold text-gray-800 dark:text-white mb-4">
+          {{ editingProject ? 'Edit Project' : 'Add Project' }}
+        </h3>
+        <form [formGroup]="projectForm" (ngSubmit)="saveProject()" class="flex flex-col gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Title -->
+            <div class="flex flex-col gap-1">
+              <label for="projTitle" class="text-sm font-medium text-gray-700 dark:text-gray-300">Title</label>
+              <input id="projTitle" type="text" pInputText formControlName="title" placeholder="Project title" class="w-full" />
+              <small
+                *ngIf="projectForm.get('title')?.touched && projectForm.get('title')?.hasError('required')"
+                class="text-red-500 dark:text-red-400 text-xs"
+              >
+                Title is required.
+              </small>
+            </div>
+            <!-- Thumbnail URL -->
+            <div class="flex flex-col gap-1">
+              <label for="projThumbnail" class="text-sm font-medium text-gray-700 dark:text-gray-300">Thumbnail URL</label>
+              <input id="projThumbnail" type="text" pInputText formControlName="thumbnailUrl" placeholder="https://..." class="w-full" />
+            </div>
+            <!-- Live URL -->
+            <div class="flex flex-col gap-1">
+              <label for="projLiveUrl" class="text-sm font-medium text-gray-700 dark:text-gray-300">Live URL</label>
+              <input id="projLiveUrl" type="text" pInputText formControlName="liveUrl" placeholder="https://..." class="w-full" />
+            </div>
+            <!-- Repo URL -->
+            <div class="flex flex-col gap-1">
+              <label for="projRepoUrl" class="text-sm font-medium text-gray-700 dark:text-gray-300">Repository URL</label>
+              <input id="projRepoUrl" type="text" pInputText formControlName="repoUrl" placeholder="https://github.com/..." class="w-full" />
+            </div>
+          </div>
+          <!-- Description -->
+          <div class="flex flex-col gap-1">
+            <label for="projDescription" class="text-sm font-medium text-gray-700 dark:text-gray-300">Description</label>
+            <textarea
+              id="projDescription"
+              formControlName="description"
+              rows="4"
+              placeholder="Describe the project"
+              class="w-full rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 text-gray-800 dark:text-gray-100 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+            ></textarea>
+          </div>
+          <!-- Technologies -->
+          <div class="flex flex-col gap-1">
+            <label for="projTechnologies" class="text-sm font-medium text-gray-700 dark:text-gray-300">Technologies (comma separated)</label>
+            <input id="projTechnologies" type="text" pInputText formControlName="technologies" placeholder="Angular, Firebase, Tailwind" class="w-full" />
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <!-- Featured -->
+            <div class="flex items-center gap-2">
+              <input id="projFeatured" type="checkbox" formControlName="featured" class="rounded text-indigo-600" />
+              <label for="projFeatured" class="text-sm text-gray-700 dark:text-gray-300">Featured project</label>
+            </div>
+            <!-- Sort Order -->
+            <div class="flex flex-col gap-1">
+              <label for="projSortOrder" class="text-sm font-medium text-gray-700 dark:text-gray-300">Sort Order</label>
+              <input id="projSortOrder" type="number" pInputText formControlName="sortOrder" class="w-full" />
+            </div>
+          </div>
+          <div class="flex justify-end gap-3 pt-2">
+            <p-button label="Cancel" severity="secondary" (onClick)="cancelProjectForm()"></p-button>
+            <p-button
+              type="submit"
+              [label]="editingProject ? 'Update Project' : 'Create Project'"
+              icon="fa-solid fa-floppy-disk"
+              [disabled]="projectSaving"
+              [loading]="projectSaving"
+            ></p-button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Projects List -->
+      <div *ngIf="!projectsLoading && projects.length === 0 && !showProjectForm" class="text-center py-10 text-gray-400 dark:text-gray-500">
+        No projects yet. Click "Add Project" to get started.
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div
+          *ngFor="let project of projects"
+          class="bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden flex flex-col"
+        >
+          <!-- Thumbnail -->
+          <div class="h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
+            <img
+              *ngIf="project.thumbnailUrl"
+              [src]="project.thumbnailUrl"
+              [alt]="project.title"
+              class="w-full h-full object-cover"
+            />
+            <div
+              *ngIf="!project.thumbnailUrl"
+              class="w-full h-full flex items-center justify-center"
+            >
+              <i class="fa-solid fa-image text-3xl text-gray-400 dark:text-gray-500"></i>
+            </div>
+          </div>
+          <!-- Content -->
+          <div class="p-4 flex flex-col gap-2 flex-1">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-semibold text-gray-800 dark:text-white truncate">{{ project.title }}</h4>
+              <span
+                *ngIf="project.featured"
+                class="px-2 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-xs rounded-full flex-shrink-0"
+              >
+                Featured
+              </span>
+            </div>
+            <p class="text-xs text-gray-500 dark:text-gray-400 line-clamp-2">{{ project.description }}</p>
+            <div *ngIf="project.technologies.length" class="flex flex-wrap gap-1.5 mt-1">
+              <span
+                *ngFor="let tech of project.technologies"
+                class="px-2 py-0.5 bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300 text-xs rounded-full"
+              >
+                {{ tech }}
+              </span>
+            </div>
+            <!-- Links -->
+            <div class="flex gap-3 mt-auto pt-2">
+              <a
+                *ngIf="project.liveUrl"
+                [href]="project.liveUrl"
+                target="_blank"
+                class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+              >
+                <i class="fa-solid fa-arrow-up-right-from-square mr-1"></i>Live
+              </a>
+              <a
+                *ngIf="project.repoUrl"
+                [href]="project.repoUrl"
+                target="_blank"
+                class="text-xs text-indigo-600 dark:text-indigo-400 hover:underline"
+              >
+                <i class="fa-brands fa-github mr-1"></i>Repo
+              </a>
+            </div>
+            <!-- Actions -->
+            <div class="flex justify-end gap-2 border-t border-gray-200 dark:border-gray-700 pt-3 mt-2">
+              <button
+                (click)="openEditProject(project)"
+                class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                pTooltip="Edit"
+              >
+                <i class="fa-solid fa-pen-to-square"></i>
+              </button>
+              <button
+                (click)="deleteProject(project)"
+                class="text-sm text-red-600 dark:text-red-400 hover:underline"
+                pTooltip="Delete"
+              >
+                <i class="fa-solid fa-trash"></i>
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+    </div>
+  </main>
+</div>

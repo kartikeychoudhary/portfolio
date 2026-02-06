@@ -1,0 +1,47 @@
+<nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
+     [class.bg-surface-card]="isScrolled"
+     [class.shadow-md]="isScrolled"
+     [class.bg-transparent]="!isScrolled">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
+      <a class="text-xl font-bold cursor-pointer" tabindex="0" role="button"
+         (click)="scrollTo('hero')" (keydown.enter)="scrollTo('hero')"
+         [style.color]="'var(--p-primary-color)'">
+        KC
+      </a>
+
+      <!-- Desktop Nav -->
+      <div class="hidden md:flex items-center gap-6">
+        <a *ngFor="let link of navLinks"
+           class="cursor-pointer hover:text-primary transition-colors font-medium"
+           tabindex="0" role="button" (click)="scrollTo(link.fragment)" (keydown.enter)="scrollTo(link.fragment)">
+          {{ link.label }}
+        </a>
+        <a routerLink="/blog" class="cursor-pointer hover:text-primary transition-colors font-medium">
+          Blog
+        </a>
+        <app-theme-toggle></app-theme-toggle>
+      </div>
+
+      <!-- Mobile Hamburger -->
+      <div class="md:hidden flex items-center gap-2">
+        <app-theme-toggle></app-theme-toggle>
+        <p-button icon="pi pi-bars" [text]="true" (click)="toggleMobileMenu()"></p-button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Menu -->
+  <div *ngIf="isMobileMenuOpen" class="md:hidden bg-surface-card border-t border-surface-border">
+    <div class="px-4 py-2 space-y-2">
+      <a *ngFor="let link of navLinks"
+         class="block py-2 cursor-pointer hover:text-primary transition-colors"
+         tabindex="0" role="button" (click)="scrollTo(link.fragment)" (keydown.enter)="scrollTo(link.fragment)">
+        {{ link.label }}
+      </a>
+      <a routerLink="/blog" class="block py-2 cursor-pointer hover:text-primary transition-colors">
+        Blog
+      </a>
+    </div>
+  </div>
+</nav>

@@ -1,0 +1,5 @@
+<div class="text-center py-8">
+  <h2 class="text-3xl font-bold mb-2" [style.color]="'var(--p-primary-color)'">{{ title }}</h2>
+  <div class="w-20 h-1 mx-auto mb-4" [style.background]="'var(--p-primary-color)'"></div>
+  <p *ngIf="subtitle" class="text-lg" [style.color]="'var(--p-text-muted-color)'">{{ subtitle }}</p>
+</div>

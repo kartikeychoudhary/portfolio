@@ -1,0 +1,128 @@
+<div class="settings-page">
+  <div class="container mx-auto px-4 py-8 max-w-2xl">
+    <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+      <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-6">
+        <i class="fa-solid fa-gear mr-2"></i>
+        Settings
+      </h1>
+
+      <div class="mb-6">
+        <h2 class="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+          Change Password
+        </h2>
+
+        <!-- Success Message -->
+        <div *ngIf="successMessage" class="mb-4 p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-md">
+          <div class="flex items-center">
+            <i class="fa-solid fa-circle-check text-green-600 dark:text-green-400 mr-2"></i>
+            <p class="text-sm text-green-800 dark:text-green-200">{{ successMessage }}</p>
+          </div>
+        </div>
+
+        <!-- Error Message -->
+        <div *ngIf="errorMessage" class="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-md">
+          <div class="flex items-center">
+            <i class="fa-solid fa-circle-exclamation text-red-600 dark:text-red-400 mr-2"></i>
+            <p class="text-sm text-red-800 dark:text-red-200">{{ errorMessage }}</p>
+          </div>
+        </div>
+
+        <form [formGroup]="changePasswordForm" (ngSubmit)="onSubmit()">
+          <!-- Current Password -->
+          <div class="mb-4">
+            <label for="currentPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Current Password
+            </label>
+            <div class="relative">
+              <input
+                [type]="showCurrentPassword ? 'text' : 'password'"
+                id="currentPassword"
+                formControlName="currentPassword"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white pr-10"
+                [class.border-red-500]="currentPassword?.invalid && currentPassword?.touched"
+              />
+              <button
+                type="button"
+                (click)="togglePasswordVisibility('current')"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <i [class]="showCurrentPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="currentPassword?.invalid && currentPassword?.touched" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              <span *ngIf="currentPassword?.errors?.['required']">Current password is required</span>
+            </div>
+          </div>
+
+          <!-- New Password -->
+          <div class="mb-4">
+            <label for="newPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              New Password
+            </label>
+            <div class="relative">
+              <input
+                [type]="showNewPassword ? 'text' : 'password'"
+                id="newPassword"
+                formControlName="newPassword"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white pr-10"
+                [class.border-red-500]="newPassword?.invalid && newPassword?.touched"
+              />
+              <button
+                type="button"
+                (click)="togglePasswordVisibility('new')"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <i [class]="showNewPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="newPassword?.invalid && newPassword?.touched" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              <span *ngIf="newPassword?.errors?.['required']">New password is required</span>
+              <span *ngIf="newPassword?.errors?.['minlength']">Password must be at least 8 characters</span>
+              <span *ngIf="newPassword?.errors?.['passwordStrength']">Password must contain uppercase, lowercase, and digit</span>
+            </div>
+          </div>
+
+          <!-- Confirm Password -->
+          <div class="mb-6">
+            <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+              Confirm New Password
+            </label>
+            <div class="relative">
+              <input
+                [type]="showConfirmPassword ? 'text' : 'password'"
+                id="confirmPassword"
+                formControlName="confirmPassword"
+                class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white pr-10"
+                [class.border-red-500]="(confirmPassword?.invalid && confirmPassword?.touched) || (changePasswordForm.errors?.['passwordMismatch'] && confirmPassword?.touched)"
+              />
+              <button
+                type="button"
+                (click)="togglePasswordVisibility('confirm')"
+                class="absolute right-2 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200"
+              >
+                <i [class]="showConfirmPassword ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye'"></i>
+              </button>
+            </div>
+            <div *ngIf="confirmPassword?.touched" class="mt-1 text-sm text-red-600 dark:text-red-400">
+              <span *ngIf="confirmPassword?.errors?.['required']">Password confirmation is required</span>
+              <span *ngIf="changePasswordForm.errors?.['passwordMismatch'] && !confirmPassword?.errors?.['required']">Passwords do not match</span>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          <button
+            type="submit"
+            [disabled]="isSubmitting"
+            class="w-full bg-blue-600 hover:bg-blue-700 disabled:bg-blue-400 text-white font-medium py-2 px-4 rounded-md transition duration-150 ease-in-out"
+          >
+            <span *ngIf="!isSubmitting">Change Password</span>
+            <span *ngIf="isSubmitting">
+              <i class="fa-solid fa-spinner fa-spin mr-2"></i>
+              Changing Password...
+            </span>
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>

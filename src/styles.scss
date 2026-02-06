@@ -1,0 +1,26 @@
+/* Font Awesome */
+@import "@fortawesome/fontawesome-free/css/all.min.css";
+
+/* PrimeIcons */
+@import "primeicons/primeicons.css";
+
+/* Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* AG Grid Community */
+@import "ag-grid-community/styles/ag-grid.css";
+@import "ag-grid-community/styles/ag-theme-alpine.css";
+
+/* Google Font - Inter */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+/* Global body */
+body {
+  margin: 0;
+  font-family: 'Inter', var(--font-family), sans-serif;
+  background: var(--p-surface-ground, #ffffff);
+  color: var(--p-text-color, #334155);
+  transition: background 0.3s, color 0.3s;
+}
