@@ -1,6 +1,11 @@
-import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import {
+  Component, ChangeDetectionStrategy, OnInit, OnDestroy,
+  AfterViewInit, ElementRef, ViewChild, Inject, PLATFORM_ID,
+  ChangeDetectorRef, NgZone
+} from '@angular/core';
+import { isPlatformBrowser } from '@angular/common';
+import { Observable, of, Subject, fromEvent } from 'rxjs';
+import { map, catchError, takeUntil, throttleTime } from 'rxjs/operators';
 import { PortfolioService } from '../../services/portfolio.service';
 import { ExperienceDto } from '../../../../core/models/experience.model';
 
@@ -11,13 +16,22 @@ import { ExperienceDto } from '../../../../core/models/experience.model';
   styleUrls: ['./experience-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class ExperienceSectionComponent implements OnInit {
-  experiences$!: Observable<ExperienceDto[]>;
+export class ExperienceSectionComponent implements OnInit, AfterViewInit, OnDestroy {
+  @ViewChild('experienceSection', { static: true }) sectionRef!: ElementRef<HTMLElement>;
 
-  constructor(private portfolioService: PortfolioService) {}
+  experiences$!: Observable<ExperienceDto[]>;
+  sectionScrollProgress = 0;
+
+  private destroy$ = new Subject<void>();
+
+  constructor(
+    private portfolioService: PortfolioService,
+    private cdr: ChangeDetectorRef,
+    private ngZone: NgZone,
+    @Inject(PLATFORM_ID) private platformId: object
+  ) {}
 
   ngOnInit(): void {
-    // Get experiences sorted by start date (newest first)
     this.experiences$ = this.portfolioService.getExperiences().pipe(
       map(experiences =>
         [...experiences].sort((a, b) =>
@@ -25,34 +39,59 @@ export class ExperienceSectionComponent implements OnInit {
         )
       ),
       catchError(error => {
-        console.error('Failed to load experiences, using fallback data:', error);
-        // Return empty array as fallback when API fails
+        console.error('Failed to load experiences:', error);
         return of([]);
       })
     );
   }
 
-  calculateDuration(exp: ExperienceDto): string {
-    const start = new Date(exp.startDate);
-    const end = exp.isCurrent ? new Date() : new Date(exp.endDate || '');
+  ngAfterViewInit(): void {
+    if (!isPlatformBrowser(this.platformId)) return;
 
-    const months = (end.getFullYear() - start.getFullYear()) * 12 +
-                   (end.getMonth() - start.getMonth());
-
-    const years = Math.floor(months / 12);
-    const remainingMonths = months % 12;
-
-    if (years === 0) {
-      return `${months} month${months !== 1 ? 's' : ''}`;
-    }
-    if (remainingMonths === 0) {
-      return `${years} year${years !== 1 ? 's' : ''}`;
-    }
-    return `${years} year${years !== 1 ? 's' : ''}, ${remainingMonths} month${remainingMonths !== 1 ? 's' : ''}`;
+    this.ngZone.runOutsideAngular(() => {
+      fromEvent(window, 'scroll', { passive: true })
+        .pipe(
+          throttleTime(16, undefined, { leading: true, trailing: true }),
+          takeUntil(this.destroy$)
+        )
+        .subscribe(() => {
+          const progress = this.calculateSectionProgress();
+          if (progress !== this.sectionScrollProgress) {
+            this.sectionScrollProgress = progress;
+            this.ngZone.run(() => this.cdr.markForCheck());
+          }
+        });
+    });
   }
 
-  formatDate(dateString: string): string {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { month: 'short', year: 'numeric' });
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+  }
+
+  getYear(exp: ExperienceDto): string {
+    if (exp.isCurrent) return 'NOW';
+    return new Date(exp.startDate).getFullYear().toString();
+  }
+
+  getEntryOpacity(index: number, total: number): number {
+    if (total <= 1) return 1;
+    const fadeStart = Math.max(0, total - 3);
+    if (index < fadeStart) return 1;
+    const fadeProgress = (index - fadeStart) / (total - fadeStart);
+    return 1 - (fadeProgress * 0.7);
+  }
+
+  private calculateSectionProgress(): number {
+    const section = this.sectionRef.nativeElement;
+    const rect = section.getBoundingClientRect();
+    const viewportHeight = window.innerHeight;
+
+    if (rect.top >= viewportHeight) return 0;
+    if (rect.bottom <= 0) return 1;
+
+    const totalScrollDistance = rect.height + viewportHeight;
+    const scrolled = viewportHeight - rect.top;
+    return Math.max(0, Math.min(1, scrolled / totalScrollDistance));
   }
 }

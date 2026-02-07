@@ -5,7 +5,7 @@ import { PortfolioRoutingModule } from './portfolio-routing.module';
 import { InputTextModule } from 'primeng/inputtext';
 import { TextareaModule } from 'primeng/textarea';
 import { ProgressBarModule } from 'primeng/progressbar';
-import { TimelineModule } from 'primeng/timeline';
+
 
 import { PortfolioPageComponent } from './pages/portfolio-page/portfolio-page.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
@@ -38,8 +38,7 @@ import { ContactSectionComponent } from './components/contact-section/contact-se
     PortfolioRoutingModule,
     InputTextModule,
     TextareaModule,
-    ProgressBarModule,
-    TimelineModule
+    ProgressBarModule
   ]
 })
 export class PortfolioModule { }
