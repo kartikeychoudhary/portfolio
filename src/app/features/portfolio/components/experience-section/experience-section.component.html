@@ -1,86 +1,48 @@
-<section id="experience" class="experience-section">
+<section id="experience" class="experience-section" #experienceSection>
   <div class="container">
     <!-- Section Header -->
     <h2 class="experience-title">
-      Experience
+      My career &amp; <span class="title-accent">experience</span>
     </h2>
-    <p class="experience-subtitle">
-      My professional journey
-    </p>
 
-    <!-- PrimeNG Timeline -->
-    <div *ngIf="experiences$ | async as experiences" class="experience-content">
-      <p-timeline
-        [value]="experiences"
-        layout="horizontal"
-        align="top"
-        styleClass="experience-timeline">
+    <!-- Timeline -->
+    <div *ngIf="experiences$ | async as experiences" class="timeline">
 
-        <!-- Custom Marker Template -->
-        <ng-template pTemplate="marker" let-experience>
-          <div class="timeline-marker-wrapper">
-            <div
-              class="timeline-marker"
-              [class.current]="experience.isCurrent">
-              <img
-                *ngIf="experience.companyLogo"
-                [src]="experience.companyLogo"
-                [alt]="experience.company"
-                class="marker-logo">
-              <i *ngIf="!experience.companyLogo" class="pi pi-briefcase marker-icon"></i>
-            </div>
-          </div>
-        </ng-template>
+      <!-- Vertical Track (absolute positioned in center) -->
+      <div class="timeline-track-wrapper">
+        <div class="timeline-track"></div>
+        <div
+          class="timeline-track-fill"
+          [style.height.%]="sectionScrollProgress * 100">
+        </div>
+        <div
+          class="timeline-dot"
+          [style.top.%]="sectionScrollProgress * 100">
+        </div>
+      </div>
 
-        <!-- Custom Content Template -->
-        <ng-template pTemplate="content" let-experience>
-          <div class="experience-card" appSpotlightCard>
-            <!-- Company & Role -->
-            <div class="experience-header">
-              <div class="experience-info">
-                <div class="role-header">
-                  <h3 class="experience-role">{{ experience.role }}</h3>
-                  <span class="current-badge" *ngIf="experience.isCurrent">Current</span>
-                </div>
-                <p class="experience-company">{{ experience.company }}</p>
-                <p class="experience-location" *ngIf="experience.location">
-                  <i class="pi pi-map-marker"></i>
-                  {{ experience.location }}
-                </p>
-              </div>
-              <img
-                *ngIf="experience.companyLogo"
-                [src]="experience.companyLogo"
-                [alt]="experience.company"
-                class="experience-logo">
-            </div>
+      <!-- Timeline Entries -->
+      <div
+        *ngFor="let exp of experiences; let i = index"
+        class="timeline-entry"
+        [style.opacity]="getEntryOpacity(i, experiences.length)">
 
-            <!-- Duration -->
-            <p class="experience-duration">
-              {{ formatDate(experience.startDate) }} -
-              {{ experience.isCurrent ? 'Present' : formatDate(experience.endDate!) }}
-              · {{ calculateDuration(experience) }}
-            </p>
+        <!-- Left: Role & Company -->
+        <div class="timeline-left">
+          <h3 class="timeline-role">{{ exp.role }}</h3>
+          <p class="timeline-company">{{ exp.company }}</p>
+        </div>
 
-            <!-- Description -->
-            <div class="experience-description" [innerHTML]="experience.description"></div>
+        <!-- Center: Year -->
+        <div class="timeline-center">
+          <span class="timeline-year">{{ getYear(exp) }}</span>
+        </div>
 
-            <!-- Technologies -->
-            <div class="experience-technologies" *ngIf="experience.technologies?.length">
-              <span *ngFor="let tech of experience.technologies" class="experience-tech-tag">
-                {{ tech }}
-              </span>
-            </div>
-          </div>
-        </ng-template>
-
-        <!-- Date on Opposite Side -->
-        <ng-template pTemplate="opposite" let-experience>
-          <div class="timeline-date">
-            {{ formatDate(experience.startDate) }}
-          </div>
-        </ng-template>
-      </p-timeline>
+        <!-- Right: Description -->
+        <div class="timeline-right">
+          <div class="timeline-description" [innerHTML]="exp.description"></div>
+        </div>
+      </div>
     </div>
   </div>
 </section>

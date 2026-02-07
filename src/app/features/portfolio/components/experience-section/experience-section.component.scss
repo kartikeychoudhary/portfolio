@@ -1,248 +1,182 @@
 @import '../../../../../styles/theme';
 
+// ============================================
+// Section Container
+// ============================================
 .experience-section {
   @include section-spacing;
-  background: var(--surface-card);
+  background: var(--surface-ground);
+  position: relative;
+  overflow: hidden;
 }
 
+.container {
+  @include container;
+}
+
+// ============================================
+// Section Title
+// ============================================
 .experience-title {
   @include font-heading;
-  font-size: clamp(2.25rem, 5vw, 3rem);
-  text-align: center;
-  margin-bottom: var(--spacing-md);
-  @include text-gradient(var(--color-primary-500), var(--color-primary-700));
-}
-
-.experience-subtitle {
-  font-size: var(--font-size-lg);
-  color: var(--text-secondary);
+  font-size: clamp(2.25rem, 5vw, 3.5rem);
   text-align: center;
   margin-bottom: var(--spacing-3xl);
-}
+  color: var(--text-primary);
+  line-height: 1.2;
 
-.experience-content {
-  max-width: 100%;
-  margin: 0 auto;
-}
-
-// ============================================
-// PrimeNG Timeline Customization
-// ============================================
-
-::ng-deep {
-  .experience-timeline {
-    .p-timeline-event {
-      min-height: auto;
-      padding: 0 var(--spacing-md);
-    }
-
-    .p-timeline-event-connector {
-      background-color: var(--surface-border);
-      width: 2px;
-    }
-
-    .p-timeline-event-opposite {
-      flex: 0;
-      padding: 0 var(--spacing-md);
-      margin-bottom: var(--spacing-md);
-    }
-
-    .p-timeline-event-content {
-      padding: 0 var(--spacing-md);
-      margin-top: var(--spacing-lg);
-    }
-
-    // Horizontal layout adjustments
-    &.p-timeline-horizontal {
-      .p-timeline-event {
-        flex-direction: column;
-      }
-
-      .p-timeline-event-connector {
-        flex-grow: 1;
-        height: 2px;
-        width: auto;
-      }
-
-      .p-timeline-event-opposite {
-        margin-bottom: var(--spacing-md);
-      }
-    }
+  .title-accent {
+    color: var(--color-primary-500);
+    font-style: italic;
   }
 }
 
 // ============================================
-// Timeline Marker
+// Timeline Container
 // ============================================
-
-.timeline-marker-wrapper {
-  display: flex;
-  justify-content: center;
-  align-items: center;
+.timeline {
+  position: relative;
+  max-width: 1100px;
+  margin: 0 auto;
 }
 
-.timeline-marker {
-  width: 3rem;
-  height: 3rem;
+// ============================================
+// Vertical Track (Center Line)
+// ============================================
+.timeline-track-wrapper {
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.timeline-track {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  width: 100%;
+  background: rgba(var(--color-primary-rgb), 0.15);
+  border-radius: var(--radius-full);
+}
+
+.timeline-track-fill {
+  position: absolute;
+  top: 0;
+  width: 100%;
+  background: linear-gradient(
+    180deg,
+    var(--color-primary-500) 0%,
+    var(--color-primary-400) 100%
+  );
+  border-radius: var(--radius-full);
+  transition: height 100ms linear;
+  box-shadow: 0 0 8px rgba(var(--color-primary-rgb), 0.4),
+              0 0 16px rgba(var(--color-primary-rgb), 0.2);
+}
+
+// ============================================
+// Glowing Dot
+// ============================================
+.timeline-dot {
+  position: absolute;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 16px;
+  height: 16px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: var(--surface-card);
-  border: 3px solid var(--surface-border);
-  transition: all var(--transition-base);
-  box-shadow: var(--shadow-md);
+  background: var(--color-primary-500);
+  box-shadow:
+    0 0 12px rgba(var(--color-primary-rgb), 0.6),
+    0 0 24px rgba(var(--color-primary-rgb), 0.3),
+    0 0 48px rgba(var(--color-primary-rgb), 0.15);
+  z-index: 2;
+  transition: top 100ms linear;
 
-  &.current {
-    border-color: var(--color-primary-500);
-    box-shadow: 0 0 0 4px rgba(var(--color-primary-rgb), 0.2), var(--shadow-lg);
-
-    .marker-icon {
-      color: var(--color-primary-500);
-    }
-  }
-
-  .marker-logo {
-    width: 2rem;
-    height: 2rem;
+  &::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 8px;
+    height: 8px;
     border-radius: 50%;
-    object-fit: cover;
+    background: white;
+    opacity: 0.8;
   }
-
-  .marker-icon {
-    font-size: 1.25rem;
-    color: var(--text-muted);
-  }
-}
-
-.timeline-date {
-  font-size: var(--font-size-sm);
-  color: var(--text-secondary);
-  font-weight: var(--font-weight-medium);
-  white-space: nowrap;
-  text-align: center;
 }
 
 // ============================================
-// Experience Card
+// Timeline Entry (Three-Column Grid)
 // ============================================
-
-.experience-card {
-  background: var(--surface-card);
-  border: 1px solid var(--surface-border);
-  border-radius: var(--radius-lg);
-  padding: var(--spacing-xl);
-  box-shadow: var(--shadow-md);
-  transition: all var(--transition-base);
-  animation: fadeInUp 0.4s ease-out;
-  max-width: 600px;
-  margin: 0 auto;
-
-  @include mobile {
-    padding: var(--spacing-lg);
-  }
-}
-
-.experience-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: var(--spacing-lg);
-  gap: var(--spacing-lg);
-
-  @include mobile {
-    flex-direction: column-reverse;
-    align-items: center;
-    text-align: center;
-  }
-}
-
-.experience-info {
-  flex: 1;
-}
-
-.role-header {
-  display: flex;
+.timeline-entry {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: var(--spacing-xl);
   align-items: center;
-  gap: var(--spacing-md);
-  margin-bottom: var(--spacing-sm);
-  flex-wrap: wrap;
-
-  @include mobile {
-    justify-content: center;
-  }
+  padding: var(--spacing-2xl) 0;
+  position: relative;
+  z-index: 3;
+  transition: opacity var(--transition-slow);
 }
 
-.experience-role {
+// ============================================
+// Left Column: Role Info
+// ============================================
+.timeline-left {
+  text-align: right;
+  padding-right: var(--spacing-2xl);
+}
+
+.timeline-role {
   @include font-heading;
   font-size: var(--font-size-xl);
-  margin: 0;
-
-  @include mobile {
-    font-size: var(--font-size-lg);
-  }
+  margin: 0 0 var(--spacing-xs) 0;
+  color: var(--text-primary);
 }
 
-.current-badge {
-  display: inline-block;
-  padding: var(--spacing-xs) var(--spacing-sm);
-  background: var(--color-primary-500);
-  color: white;
-  border-radius: var(--radius-sm);
-  font-size: var(--font-size-xs);
-  font-weight: var(--font-weight-semibold);
-  text-transform: uppercase;
-}
-
-.experience-company {
+.timeline-company {
   font-size: var(--font-size-base);
   color: var(--color-primary-500);
   font-weight: var(--font-weight-semibold);
-  margin-bottom: var(--spacing-xs);
+  margin: 0;
 }
 
-.experience-location {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
+// ============================================
+// Center Column: Year
+// ============================================
+.timeline-center {
   display: flex;
   align-items: center;
-  gap: var(--spacing-xs);
-
-  @include mobile {
-    justify-content: center;
-  }
-
-  i {
-    font-size: var(--font-size-sm);
-  }
+  justify-content: center;
+  min-width: 80px;
+  position: relative;
+  z-index: 3;
 }
 
-.experience-logo {
-  width: 4rem;
-  height: 4rem;
-  border-radius: var(--radius-md);
-  object-fit: cover;
-  box-shadow: var(--shadow-md);
-  flex-shrink: 0;
+.timeline-year {
+  @include font-heading;
+  font-size: var(--font-size-2xl);
+  color: var(--text-primary);
+  white-space: nowrap;
+  letter-spacing: 0.02em;
 }
 
-.experience-duration {
-  font-size: var(--font-size-sm);
-  color: var(--text-muted);
-  margin-bottom: var(--spacing-md);
-  padding-bottom: var(--spacing-md);
-  border-bottom: 1px solid var(--surface-border);
-
-  @include mobile {
-    text-align: center;
-  }
+// ============================================
+// Right Column: Description
+// ============================================
+.timeline-right {
+  padding-left: var(--spacing-2xl);
 }
 
-.experience-description {
+.timeline-description {
   font-size: var(--font-size-sm);
   color: var(--text-secondary);
   line-height: var(--line-height-relaxed);
-  margin-bottom: var(--spacing-lg);
 
   ::ng-deep {
     p {
@@ -265,51 +199,68 @@
   }
 }
 
-.experience-technologies {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--spacing-sm);
-}
-
-.experience-tech-tag {
-  padding: var(--spacing-xs) var(--spacing-md);
-  font-size: var(--font-size-sm);
-  background: rgba(var(--color-primary-rgb), 0.1);
-  color: var(--color-primary-500);
-  border: 1px solid rgba(var(--color-primary-rgb), 0.2);
-  border-radius: var(--radius-full);
-  font-weight: var(--font-weight-medium);
-}
-
 // ============================================
-// Animations
+// Responsive: Mobile
 // ============================================
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-// ============================================
-// Responsive Adjustments
-// ============================================
-
 @include mobile {
-  ::ng-deep {
-    .experience-timeline.p-timeline-horizontal {
-      .p-timeline-event-separator {
-        flex-direction: row;
-      }
-    }
+  .experience-title {
+    font-size: clamp(1.75rem, 8vw, 2.25rem);
   }
 
-  .experience-card {
-    max-width: 100%;
+  .timeline-track-wrapper {
+    left: 20px;
+    transform: none;
+  }
+
+  .timeline-entry {
+    grid-template-columns: 50px 1fr;
+    gap: var(--spacing-md);
+    padding: var(--spacing-lg) 0;
+  }
+
+  .timeline-left {
+    grid-column: 2;
+    grid-row: 1;
+    text-align: left;
+    padding-right: 0;
+    padding-left: 0;
+  }
+
+  .timeline-center {
+    grid-column: 1;
+    grid-row: 1 / 3;
+    min-width: auto;
+    align-items: flex-start;
+    padding-top: var(--spacing-xs);
+  }
+
+  .timeline-year {
+    font-size: var(--font-size-xs);
+    writing-mode: vertical-lr;
+    transform: rotate(180deg);
+    color: var(--text-muted);
+  }
+
+  .timeline-right {
+    grid-column: 2;
+    grid-row: 2;
+    padding-left: 0;
+  }
+}
+
+// ============================================
+// Responsive: Tablet
+// ============================================
+@include tablet {
+  .timeline-entry {
+    gap: var(--spacing-lg);
+  }
+
+  .timeline-left {
+    padding-right: var(--spacing-xl);
+  }
+
+  .timeline-right {
+    padding-left: var(--spacing-xl);
   }
 }
