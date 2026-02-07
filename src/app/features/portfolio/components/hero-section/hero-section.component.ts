@@ -1,8 +1,8 @@
-import { Component, ChangeDetectionStrategy, OnInit, OnDestroy, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { PortfolioService } from '../../services/portfolio.service';
 import { ProfileDto } from '../../../../core/models/profile.model';
-import { DoublePendulumService } from '../../../../core/services/double-pendulum.service';
 
 @Component({
   selector: 'app-hero-section',
@@ -11,32 +11,34 @@ import { DoublePendulumService } from '../../../../core/services/double-pendulum
   styleUrls: ['./hero-section.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class HeroSectionComponent implements OnInit, AfterViewInit, OnDestroy {
-  @ViewChild('pendulumCanvas', { static: false }) canvasRef!: ElementRef<HTMLCanvasElement>;
-
+export class HeroSectionComponent implements OnInit {
   profile$!: Observable<ProfileDto>;
 
   constructor(
-    private portfolioService: PortfolioService,
-    private pendulumService: DoublePendulumService
+    private portfolioService: PortfolioService
   ) {}
 
   ngOnInit(): void {
-    this.profile$ = this.portfolioService.getProfile();
-  }
-
-  ngAfterViewInit(): void {
-    // Initialize the canvas animation after view is ready
-    if (this.canvasRef?.nativeElement) {
-      setTimeout(() => {
-        this.pendulumService.initCanvas(this.canvasRef.nativeElement);
-      }, 100);
-    }
-  }
-
-  ngOnDestroy(): void {
-    // Clean up animation when component is destroyed
-    this.pendulumService.destroy();
+    this.profile$ = this.portfolioService.getProfile().pipe(
+      catchError(error => {
+        console.error('Failed to load profile, using fallback data:', error);
+        // Return fallback profile data when API fails
+        return of({
+          id: '1',
+          fullName: 'Your Name',
+          title: 'Full Stack Developer',
+          email: 'your.email@example.com',
+          phone: '',
+          tagline: 'Building innovative solutions with modern technologies',
+          bio: '',
+          avatarUrl: 'assets/images/avatar.png',
+          resumeUrl: '',
+          socialLinks: [],
+          createdAt: new Date().toISOString(),
+          updatedAt: new Date().toISOString()
+        } as ProfileDto);
+      })
+    );
   }
 
   scrollToNext(): void {
@@ -55,5 +57,22 @@ export class HeroSectionComponent implements OnInit, AfterViewInit, OnDestroy {
     if (profile.resumeUrl) {
       window.open(profile.resumeUrl, '_blank');
     }
+  }
+
+  /**
+   * Get avatar URL for display (supports both URL and Base64)
+   */
+  getAvatarUrl(profile: ProfileDto | null): string {
+    if (!profile) {
+      return 'assets/images/avatar.png';
+    }
+
+    // Use Base64 data if available
+    if (profile.avatarBase64 && profile.avatarContentType) {
+      return `data:${profile.avatarContentType};base64,${profile.avatarBase64}`;
+    }
+
+    // Fallback to URL or default
+    return profile.avatarUrl || 'assets/images/avatar.png';
   }
 }

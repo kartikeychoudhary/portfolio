@@ -1,48 +1,52 @@
 <section id="home" class="hero-section">
-  <!-- Canvas Background with Double Pendulum Animation -->
-  <canvas #pendulumCanvas class="hero-canvas"></canvas>
-
-  <!-- Dark Overlay for Content Readability -->
-  <div class="hero-overlay"></div>
-
   <!-- Hero Content -->
   <div *ngIf="profile$ | async as profile" class="hero-content">
-    <!-- Avatar -->
-    <div class="hero-avatar animate-fade-in">
-      <img [src]="profile.avatarUrl || 'assets/default-avatar.png'"
-           [alt]="profile.fullName"
-           class="hero-avatar-img">
-    </div>
+    <div class="hero-grid">
+      <!-- Left Column: Text Content -->
+      <div class="hero-text">
+        <!-- Avatar -->
+        <div class="hero-avatar animate-fade-in">
+          <img [src]="getAvatarUrl(profile)"
+               [alt]="profile.fullName"
+               class="hero-avatar-img">
+        </div>
 
-    <!-- Name -->
-    <h1 class="hero-title animate-slide-up">
-      {{ profile.fullName }}
-    </h1>
+        <!-- Name -->
+        <h1 class="hero-title animate-slide-up">
+          {{ profile.fullName }}
+        </h1>
 
-    <!-- Title -->
-    <p class="hero-subtitle animate-slide-up animation-delay-200">
-      {{ profile.title }}
-    </p>
+        <!-- Title -->
+        <p class="hero-subtitle animate-slide-up animation-delay-200">
+          {{ profile.title }}
+        </p>
 
-    <!-- Tagline -->
-    <p *ngIf="profile.tagline"
-       class="hero-tagline animate-slide-up animation-delay-300">
-      {{ profile.tagline }}
-    </p>
+        <!-- Tagline -->
+        <p *ngIf="profile.tagline"
+           class="hero-tagline animate-slide-up animation-delay-300">
+          {{ profile.tagline }}
+        </p>
 
-    <!-- Resume Download Button -->
-    <div class="hero-cta animate-slide-up animation-delay-400">
-      <button *ngIf="profile.resumeUrl"
-              (click)="downloadResume(profile)"
-              class="hero-button">
-        <i class="pi pi-download"></i>
-        <span>Download Resume</span>
-      </button>
-    </div>
+        <!-- Resume Download Button -->
+        <div class="hero-cta animate-slide-up animation-delay-400">
+          <button *ngIf="profile.resumeUrl"
+                  (click)="downloadResume(profile)"
+                  class="hero-button">
+            <i class="pi pi-download"></i>
+            <span>Download Resume</span>
+          </button>
+        </div>
 
-    <!-- Social Links -->
-    <div class="hero-social animate-slide-up animation-delay-600">
-      <app-social-links [socialLinks]="profile.socialLinks"></app-social-links>
+        <!-- Social Links -->
+        <div class="hero-social animate-slide-up animation-delay-600">
+          <app-social-links [socialLinks]="profile.socialLinks"></app-social-links>
+        </div>
+      </div>
+
+      <!-- Right Column: Developer Board (Desktop Only) -->
+      <div class="hero-board animate-slide-up animation-delay-400">
+        <app-developer-board [profile]="profile"></app-developer-board>
+      </div>
     </div>
   </div>
 

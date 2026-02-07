@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy } from '@angular/core';
-import { ThemeService } from '../../../core/services/theme.service';
+import { ThemeService, Theme } from '../../../core/services/theme.service';
+import { map } from 'rxjs/operators';
 
 @Component({
   selector: 'app-theme-toggle',
@@ -9,9 +10,26 @@ import { ThemeService } from '../../../core/services/theme.service';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class ThemeToggleComponent {
-  constructor(public themeService: ThemeService) {}
+  private readonly themes: Theme[] = ['light', 'dark', 'purple'];
+  private readonly themeIcons: Record<Theme, string> = {
+    light: 'pi-sun',
+    dark: 'pi-moon',
+    purple: 'pi-star'
+  };
 
-  toggle(): void {
-    this.themeService.toggle();
+  // Observable for the current theme icon
+  readonly themeIcon$;
+
+  constructor(public themeService: ThemeService) {
+    this.themeIcon$ = this.themeService.theme$.pipe(
+      map(theme => this.themeIcons[theme])
+    );
+  }
+
+  cycleTheme(): void {
+    const currentTheme = this.themeService.getCurrentTheme();
+    const currentIndex = this.themes.indexOf(currentTheme);
+    const nextIndex = (currentIndex + 1) % this.themes.length;
+    this.themeService.setTheme(this.themes[nextIndex]);
   }
 }

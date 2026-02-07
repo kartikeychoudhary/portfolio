@@ -1,0 +1,281 @@
+@import '../../../../../styles/theme';
+
+.about-section {
+  @include section-spacing;
+  background: var(--surface-ground);
+}
+
+.container {
+  @include container;
+}
+
+.section-title {
+  @include font-heading;
+  font-size: var(--font-size-4xl);
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+  @include text-gradient(var(--color-primary-500), var(--color-primary-700));
+}
+
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-2xl);
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.card {
+  @include card-base;
+  padding: var(--spacing-xl);
+  animation: slideUp 0.6s ease-out;
+
+  h3 {
+    @include font-heading;
+    font-size: var(--font-size-xl);
+    margin-bottom: var(--spacing-md);
+    color: var(--text-primary);
+  }
+
+  h4 {
+    @include font-heading;
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xs);
+    color: var(--text-primary);
+  }
+}
+
+// Bio Card
+.bio-card {
+  .bio-content {
+    @include font-body;
+
+    p {
+      margin-bottom: var(--spacing-md);
+
+      &:last-child {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+// Education Cards
+.subsection-title {
+  @include font-heading;
+  font-size: var(--font-size-2xl);
+  margin-bottom: var(--spacing-lg);
+  color: var(--text-primary);
+}
+
+.education-cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.education-card {
+  .education-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .education-title {
+    flex: 1;
+  }
+
+  .institution {
+    @include font-body;
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    margin-top: var(--spacing-xs);
+  }
+
+  .gpa-badge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: linear-gradient(135deg, var(--color-primary-500), var(--color-primary-600));
+    border-radius: var(--radius-md);
+    min-width: 60px;
+
+    .gpa-label {
+      font-size: var(--font-size-xs);
+      color: rgba(255, 255, 255, 0.8);
+      text-transform: uppercase;
+      font-weight: var(--font-weight-semibold);
+    }
+
+    .gpa-value {
+      font-size: var(--font-size-xl);
+      color: white;
+      font-weight: var(--font-weight-bold);
+    }
+  }
+
+  .duration {
+    @include font-body;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .achievements {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+
+    li {
+      @include font-body;
+      font-size: var(--font-size-sm);
+      color: var(--text-secondary);
+      padding-left: var(--spacing-lg);
+      position: relative;
+      margin-bottom: var(--spacing-sm);
+
+      &::before {
+        content: '✓';
+        position: absolute;
+        left: 0;
+        color: var(--color-primary-500);
+        font-weight: var(--font-weight-bold);
+      }
+    }
+  }
+}
+
+// Experience Summary - COMMENTED OUT (styles kept for potential future use)
+/*
+.experience-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+}
+
+.experience-card {
+  .experience-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: var(--spacing-md);
+    margin-bottom: var(--spacing-sm);
+  }
+
+  .current-badge {
+    display: inline-block;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    background: var(--color-primary-500);
+    color: white;
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-weight: var(--font-weight-semibold);
+    text-transform: uppercase;
+  }
+
+  .company {
+    @include font-body;
+    font-size: var(--font-size-base);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .duration {
+    @include font-body;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+  }
+
+  .description {
+    @include font-body;
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+  }
+}
+*/
+
+// Profile Card - REMOVED (styles kept for potential future use)
+/*
+.profile-card {
+  text-align: center;
+
+  .profile-avatar {
+    margin-bottom: var(--spacing-lg);
+
+    .avatar-img {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      border: 4px solid var(--color-primary-500);
+      object-fit: cover;
+      box-shadow: var(--shadow-lg);
+    }
+  }
+
+  .profile-name {
+    font-size: var(--font-size-2xl);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .profile-title {
+    @include font-body;
+    font-size: var(--font-size-base);
+    color: var(--color-primary-500);
+    font-weight: var(--font-weight-semibold);
+    margin-bottom: var(--spacing-xs);
+  }
+
+  .profile-tagline {
+    @include font-body;
+    font-size: var(--font-size-sm);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-lg);
+  }
+
+  .skills-badges {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--spacing-sm);
+    justify-content: center;
+    margin-bottom: var(--spacing-xl);
+
+    .skill-badge {
+      display: inline-block;
+      padding: var(--spacing-xs) var(--spacing-md);
+      background: var(--surface-overlay);
+      color: var(--text-primary);
+      border-radius: var(--radius-full);
+      font-size: var(--font-size-sm);
+      font-weight: var(--font-weight-medium);
+      border: 1px solid var(--surface-border);
+      transition: all var(--transition-fast);
+
+      &:hover {
+        background: var(--color-primary-500);
+        color: white;
+        border-color: var(--color-primary-500);
+        transform: translateY(-2px);
+      }
+    }
+  }
+
+  .resume-btn {
+    width: 100%;
+  }
+}
+*/
+
+// Responsive
+@include mobile {
+  .education-header {
+    flex-direction: column;
+  }
+
+  .gpa-badge {
+    align-self: flex-start;
+  }
+}

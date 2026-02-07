@@ -1,0 +1,86 @@
+<div class="avatar-upload-container">
+  <!-- Current Avatar Preview -->
+  <div class="current-avatar" *ngIf="currentAvatarUrl && !showCropper">
+    <img [src]="currentAvatarUrl" alt="Current avatar" class="avatar-preview" />
+  </div>
+
+  <!-- File Input -->
+  <div class="upload-controls" *ngIf="!showCropper">
+    <input
+      type="file"
+      #fileInput
+      accept="image/jpeg,image/png,image/webp"
+      (change)="onFileSelected($event)"
+      class="file-input"
+      hidden
+    />
+    <button
+      type="button"
+      pButton
+      label="Choose Image"
+      icon="pi pi-upload"
+      class="p-button-primary"
+      (click)="fileInput.click()"
+      [disabled]="uploading"
+    ></button>
+    <small class="upload-hint">Max 2MB • JPEG, PNG, or WebP</small>
+  </div>
+
+  <!-- Error Message -->
+  <p-message
+    *ngIf="error"
+    severity="error"
+    [text]="error"
+    styleClass="avatar-error"
+  ></p-message>
+
+  <!-- Image Cropper -->
+  <div class="cropper-container" *ngIf="showCropper">
+    <div class="cropper-info">
+      <p class="text-sm text-gray-600 dark:text-gray-400 mb-2">
+        Adjust the crop area, then click Upload to save your avatar.
+      </p>
+    </div>
+
+    <image-cropper
+      [imageChangedEvent]="imageChangedEvent"
+      [maintainAspectRatio]="true"
+      [aspectRatio]="1"
+      [resizeToWidth]="400"
+      [cropperMinWidth]="200"
+      [roundCropper]="true"
+      [format]="'png'"
+      [output]="'base64'"
+      (imageCropped)="imageCropped($event)"
+      (imageLoaded)="imageLoaded($event)"
+      (cropperReady)="cropperReady()"
+      (loadImageFailed)="loadImageFailed()"
+    ></image-cropper>
+
+    <div class="cropper-actions">
+      <button
+        type="button"
+        pButton
+        label="Cancel"
+        icon="pi pi-times"
+        class="p-button-secondary p-button-outlined"
+        (click)="cancelCrop()"
+        [disabled]="uploading"
+      ></button>
+      <button
+        type="button"
+        pButton
+        label="Upload Avatar"
+        icon="pi pi-check"
+        class="p-button-primary"
+        (click)="uploadCroppedImage()"
+        [disabled]="uploading"
+        [loading]="uploading"
+      ></button>
+    </div>
+
+    <div *ngIf="!croppedImage" class="cropper-debug">
+      <small class="text-yellow-600">Waiting for image to be cropped...</small>
+    </div>
+  </div>
+</div>

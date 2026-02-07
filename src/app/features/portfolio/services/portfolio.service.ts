@@ -6,6 +6,7 @@ import { SkillDto } from '../../../core/models/skill.model';
 import { ExperienceDto } from '../../../core/models/experience.model';
 import { ProjectDto } from '../../../core/models/project.model';
 import { ContactRequest } from '../../../core/models/contact.model';
+import { EducationDto, ExperienceSummary } from '../../../core/models/education.model';
 
 /**
  * Service for fetching public portfolio data.
@@ -56,5 +57,35 @@ export class PortfolioService {
    */
   submitContact(contact: ContactRequest): Observable<ContactRequest> {
     return this.api.post<ContactRequest>('/contacts', contact);
+  }
+
+  /**
+   * Fetches education data.
+   * @returns Observable of EducationDto array
+   */
+  getEducation(): Observable<EducationDto[]> {
+    return this.api.get<EducationDto[]>('/education');
+  }
+
+  /**
+   * Fetches experience summary for About section.
+   * @returns Observable of ExperienceSummary array
+   */
+  getExperienceSummary(): Observable<ExperienceSummary[]> {
+    return this.api.get<ExperienceSummary[]>('/experiences/summary');
+  }
+
+  /**
+   * Uploads avatar image for a profile.
+   * @param profileId - Profile ID (use "default" for main profile)
+   * @param avatarBase64 - Base64-encoded image data (without data URI prefix)
+   * @param contentType - MIME type (image/jpeg, image/png, image/webp)
+   * @returns Observable of updated ProfileDto
+   */
+  uploadAvatar(profileId: string, avatarBase64: string, contentType: string): Observable<ProfileDto> {
+    return this.api.post<ProfileDto>(`/profile/${profileId}/avatar`, {
+      avatarBase64,
+      contentType
+    });
   }
 }

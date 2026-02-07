@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, OnInit, ViewChild, ElementRef } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { PortfolioService } from '../../services/portfolio.service';
 import { ProjectDto } from '../../../../core/models/project.model';
 
@@ -18,7 +19,13 @@ export class ProjectsSectionComponent implements OnInit {
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
-    this.projects$ = this.portfolioService.getProjects();
+    this.projects$ = this.portfolioService.getProjects().pipe(
+      catchError(error => {
+        console.error('Failed to load projects, using fallback data:', error);
+        // Return empty array as fallback when API fails
+        return of([]);
+      })
+    );
   }
 
   scrollLeft(): void {

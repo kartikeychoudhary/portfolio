@@ -1,0 +1,142 @@
+@import '../../../../../styles/theme';
+
+.developer-board {
+  position: relative;
+  background: var(--surface-card);
+  border: 1px solid var(--surface-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-xl);
+  transition: all var(--transition-base);
+
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-2xl);
+  }
+}
+
+.window-controls {
+  display: flex;
+  gap: var(--spacing-sm);
+  margin-bottom: var(--spacing-md);
+  position: relative;
+  z-index: 2;
+
+  .control {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+
+    &.close {
+      background: #ff5f57;
+    }
+
+    &.minimize {
+      background: #febc2e;
+    }
+
+    &.maximize {
+      background: #28c840;
+    }
+  }
+}
+
+.code-editor {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', monospace;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  position: relative;
+  z-index: 2;
+  padding: var(--spacing-md);
+}
+
+.code-line {
+  display: flex;
+  gap: var(--spacing-md);
+  opacity: 0;
+  animation: slideInLine 0.4s ease-out forwards;
+
+  @keyframes slideInLine {
+    from {
+      opacity: 0;
+      transform: translateX(-20px);
+    }
+    to {
+      opacity: 1;
+      transform: translateX(0);
+    }
+  }
+}
+
+.line-number {
+  color: var(--text-muted);
+  user-select: none;
+  min-width: 2rem;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.line-content {
+  color: var(--text-primary);
+  white-space: pre;
+
+  // Syntax highlighting styles for innerHTML content
+  ::ng-deep .keyword {
+    color: #c678dd;
+    font-weight: var(--font-weight-semibold);
+  }
+
+  ::ng-deep .string {
+    color: #98c379;
+  }
+
+  ::ng-deep .property {
+    color: #61afef;
+  }
+
+  ::ng-deep .bracket {
+    color: #abb2bf;
+  }
+
+  ::ng-deep .boolean {
+    color: #d19a66;
+  }
+}
+
+.gradient-bg {
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: radial-gradient(
+    circle,
+    rgba(var(--color-primary-rgb), 0.1) 0%,
+    transparent 70%
+  );
+  animation: rotateGradient 20s linear infinite;
+  pointer-events: none;
+  z-index: 1;
+
+  @keyframes rotateGradient {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+}
+
+// Responsive adjustments
+@include mobile {
+  .code-editor {
+    font-size: 0.75rem;
+    padding: var(--spacing-sm);
+  }
+
+  .line-number {
+    min-width: 1.5rem;
+  }
+}

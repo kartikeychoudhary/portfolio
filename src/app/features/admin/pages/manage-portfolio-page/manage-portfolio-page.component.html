@@ -139,6 +139,20 @@
             ></textarea>
           </div>
 
+          <!-- Avatar Upload -->
+          <div class="flex flex-col gap-1">
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatar Image</label>
+            <div class="p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700">
+              <app-avatar-upload
+                [currentAvatarUrl]="getAvatarUrl()"
+                (avatarUploaded)="onAvatarUploaded($event)"
+              ></app-avatar-upload>
+            </div>
+            <small class="text-gray-500 dark:text-gray-400 text-xs">
+              Upload a new avatar image (replaces Avatar URL). Images are stored directly in the database.
+            </small>
+          </div>
+
           <!-- Avatar URL -->
           <div class="flex flex-col gap-1">
             <label for="avatarUrl" class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatar URL</label>

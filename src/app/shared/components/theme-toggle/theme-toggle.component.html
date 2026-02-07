@@ -1,5 +1,8 @@
 <p-button
-  [icon]="(themeService.isDark$ | async) ? 'pi pi-sun' : 'pi pi-moon'"
+  [icon]="'pi ' + (themeIcon$ | async)"
   [rounded]="true"
-  (click)="toggle()">
+  [text]="true"
+  [severity]="'secondary'"
+  (click)="cycleTheme()"
+  [attr.aria-label]="'Toggle theme'">
 </p-button>

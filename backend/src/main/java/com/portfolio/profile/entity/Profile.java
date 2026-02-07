@@ -42,6 +42,19 @@ public class Profile {
     @Column(name = "avatar_url", length = 500)
     private String avatarUrl;
 
+    @Lob
+    @Column(name = "avatar_data", columnDefinition = "LONGBLOB")
+    private byte[] avatarData;
+
+    @Column(name = "avatar_content_type", length = 50)
+    private String avatarContentType;
+
+    @Column(name = "avatar_file_size")
+    private Integer avatarFileSize;
+
+    @Column(name = "avatar_updated_at")
+    private LocalDateTime avatarUpdatedAt;
+
     @Column(name = "resume_url", length = 500)
     private String resumeUrl;
 

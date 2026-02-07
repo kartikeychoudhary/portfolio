@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, HostListener, ChangeDetectorRef, signal } from '@angular/core';
 import { ThemeService } from '../../../../core/services/theme.service';
+import { ScrollUtilityService } from '../../../../core/services/scroll-utility.service';
 
 @Component({
   selector: 'app-navbar',
@@ -15,6 +16,7 @@ export class NavbarComponent {
 
   sections = [
     { id: 'home', label: 'Home' },
+    { id: 'about', label: 'About' },
     { id: 'skills', label: 'Skills' },
     { id: 'experience', label: 'Experience' },
     { id: 'projects', label: 'Projects' },
@@ -23,7 +25,8 @@ export class NavbarComponent {
 
   constructor(
     public themeService: ThemeService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private scrollUtility: ScrollUtilityService
   ) {}
 
   @HostListener('window:scroll')
@@ -51,15 +54,7 @@ export class NavbarComponent {
   }
 
   scrollTo(sectionId: string): void {
-    const element = document.getElementById(sectionId);
-    if (element) {
-      const navbarHeight = 64; // Height of navbar
-      const targetPosition = element.offsetTop - navbarHeight;
-      window.scrollTo({
-        top: targetPosition,
-        behavior: 'smooth'
-      });
-    }
+    this.scrollUtility.scrollToSection(sectionId);
     this.closeMobileMenu();
   }
 

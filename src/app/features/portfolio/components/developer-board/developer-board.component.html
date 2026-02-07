@@ -1,0 +1,22 @@
+<div class="developer-board" appSpotlightCard>
+  <!-- Window Controls -->
+  <div class="window-controls">
+    <div class="control close"></div>
+    <div class="control minimize"></div>
+    <div class="control maximize"></div>
+  </div>
+
+  <!-- Code Editor -->
+  <div class="code-editor">
+    <div
+      class="code-line"
+      *ngFor="let line of codeLines; let i = index"
+      [style.animation-delay]="(i * 50) + 'ms'">
+      <span class="line-number">{{ i + 1 }}</span>
+      <span class="line-content" [innerHTML]="highlightSyntax(line)"></span>
+    </div>
+  </div>
+
+  <!-- Rotating Gradient Background -->
+  <div class="gradient-bg"></div>
+</div>

@@ -1,5 +1,6 @@
 package com.portfolio.profile.dto;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import lombok.AllArgsConstructor;
@@ -32,6 +33,16 @@ public class ProfileDto {
     private String phone;
     private String location;
     private String avatarUrl;
+
+    @JsonProperty("avatarBase64")
+    private String avatarBase64;
+
+    @JsonProperty("avatarContentType")
+    private String avatarContentType;
+
+    @JsonProperty("avatarFileSize")
+    private Integer avatarFileSize;
+
     private String resumeUrl;
 
     @Builder.Default

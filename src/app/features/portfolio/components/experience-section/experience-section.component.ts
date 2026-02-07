@@ -1,6 +1,6 @@
-import { Component, ChangeDetectionStrategy, OnInit, signal } from '@angular/core';
-import { Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
+import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
+import { Observable, of } from 'rxjs';
+import { map, catchError } from 'rxjs/operators';
 import { PortfolioService } from '../../services/portfolio.service';
 import { ExperienceDto } from '../../../../core/models/experience.model';
 
@@ -13,30 +13,23 @@ import { ExperienceDto } from '../../../../core/models/experience.model';
 })
 export class ExperienceSectionComponent implements OnInit {
   experiences$!: Observable<ExperienceDto[]>;
-  selectedIndex = signal(0);
-  selectedExperience = signal<ExperienceDto | null>(null);
 
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
     // Get experiences sorted by start date (newest first)
     this.experiences$ = this.portfolioService.getExperiences().pipe(
-      map(experiences => {
-        const sorted = [...experiences].sort((a, b) =>
+      map(experiences =>
+        [...experiences].sort((a, b) =>
           new Date(b.startDate).getTime() - new Date(a.startDate).getTime()
-        );
-        // Set the first (most recent) experience as selected
-        if (sorted.length > 0) {
-          this.selectedExperience.set(sorted[0]);
-        }
-        return sorted;
+        )
+      ),
+      catchError(error => {
+        console.error('Failed to load experiences, using fallback data:', error);
+        // Return empty array as fallback when API fails
+        return of([]);
       })
     );
-  }
-
-  selectExperience(index: number, experience: ExperienceDto): void {
-    this.selectedIndex.set(index);
-    this.selectedExperience.set(experience);
   }
 
   calculateDuration(exp: ExperienceDto): string {

@@ -1,0 +1,73 @@
+.avatar-upload-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.current-avatar {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 1rem;
+}
+
+.avatar-preview {
+  width: 150px;
+  height: 150px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 3px solid #6366f1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.upload-controls {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.upload-hint {
+  color: #6b7280;
+  font-size: 0.875rem;
+}
+
+.avatar-error {
+  margin-top: 0.5rem;
+}
+
+.cropper-container {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  background: #f9fafb;
+  border-radius: 0.5rem;
+
+  image-cropper {
+    max-height: 400px;
+    width: 100%;
+  }
+}
+
+.cropper-info {
+  text-align: center;
+}
+
+.cropper-actions {
+  display: flex;
+  gap: 0.75rem;
+  justify-content: flex-end;
+  padding-top: 0.5rem;
+  border-top: 1px solid #e5e7eb;
+
+  button {
+    min-width: 120px;
+  }
+}
+
+.cropper-debug {
+  text-align: center;
+  padding: 0.5rem;
+  background: #fef3c7;
+  border-radius: 0.25rem;
+}

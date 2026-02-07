@@ -1,5 +1,6 @@
 import { Component, ChangeDetectionStrategy, OnInit } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { PortfolioService } from '../../services/portfolio.service';
 import { SkillDto, SkillCategory } from '../../../../core/models/skill.model';
 
@@ -26,7 +27,13 @@ export class SkillsSectionComponent implements OnInit {
   constructor(private portfolioService: PortfolioService) {}
 
   ngOnInit(): void {
-    this.skills$ = this.portfolioService.getSkills();
+    this.skills$ = this.portfolioService.getSkills().pipe(
+      catchError(error => {
+        console.error('Failed to load skills, using fallback data:', error);
+        // Return empty array as fallback when API fails
+        return of([]);
+      })
+    );
   }
 
   filterSkills(skills: SkillDto[]): SkillDto[] {

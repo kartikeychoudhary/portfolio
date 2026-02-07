@@ -121,6 +121,7 @@ export class ManagePortfolioPageComponent implements OnInit {
   }
 
   // ── Profile ───────────────────────────────────────────────
+  currentProfile: ProfileDto | null = null;
 
   loadProfile(): void {
     this.profileLoading = true;
@@ -128,6 +129,7 @@ export class ManagePortfolioPageComponent implements OnInit {
 
     this.portfolioService.getProfile().subscribe({
       next: (profile: ProfileDto) => {
+        this.currentProfile = profile;
         this.profileForm.patchValue({
           fullName: profile.fullName,
           title: profile.title,
@@ -165,6 +167,54 @@ export class ManagePortfolioPageComponent implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  /**
+   * Handle avatar upload from AvatarUploadComponent
+   */
+  onAvatarUploaded(event: { base64: string; contentType: string }): void {
+    if (!this.currentProfile?.id) {
+      console.error('No profile loaded');
+      return;
+    }
+
+    this.profileSaving = true;
+    this.cdr.markForCheck();
+
+    const profileId = this.currentProfile.id || 'default';
+
+    this.portfolioService.uploadAvatar(profileId, event.base64, event.contentType).subscribe({
+      next: (updated: ProfileDto) => {
+        this.currentProfile = updated;
+        this.profileSaving = false;
+        this.cdr.markForCheck();
+        // Show success message (you may want to add a toast service)
+        console.log('Avatar uploaded successfully');
+      },
+      error: (error) => {
+        this.profileSaving = false;
+        this.cdr.markForCheck();
+        // Show error message (you may want to add a toast service)
+        console.error('Failed to upload avatar:', error);
+      },
+    });
+  }
+
+  /**
+   * Get avatar URL for display (supports both URL and Base64)
+   */
+  getAvatarUrl(): string | undefined {
+    if (!this.currentProfile) {
+      return undefined;
+    }
+
+    // Use Base64 data if available
+    if (this.currentProfile.avatarBase64 && this.currentProfile.avatarContentType) {
+      return `data:${this.currentProfile.avatarContentType};base64,${this.currentProfile.avatarBase64}`;
+    }
+
+    // Fallback to URL
+    return this.currentProfile.avatarUrl;
   }
 
   // ── Skills ────────────────────────────────────────────────

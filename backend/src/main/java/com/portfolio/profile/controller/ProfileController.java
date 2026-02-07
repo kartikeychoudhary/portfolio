@@ -1,5 +1,6 @@
 package com.portfolio.profile.controller;
 
+import com.portfolio.profile.dto.AvatarUploadRequest;
 import com.portfolio.profile.dto.ProfileDto;
 import com.portfolio.profile.service.ProfileService;
 import jakarta.validation.Valid;
@@ -27,5 +28,26 @@ public class ProfileController {
     public ResponseEntity<ProfileDto> updateProfile(@Valid @RequestBody ProfileDto profileDto) {
         ProfileDto updatedProfile = profileService.updateProfile(profileDto);
         return ResponseEntity.ok(updatedProfile);
+    }
+
+    /**
+     * Upload avatar image
+     * ADMIN only
+     * @param profileId Profile ID (use "default" for the main profile)
+     * @param request Avatar upload request with Base64 data and content type
+     * @return Updated profile with new avatar
+     */
+    @PostMapping("/{profileId}/avatar")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ProfileDto> uploadAvatar(
+        @PathVariable String profileId,
+        @Valid @RequestBody AvatarUploadRequest request
+    ) {
+        ProfileDto updated = profileService.updateAvatar(
+            profileId,
+            request.getAvatarBase64(),
+            request.getContentType()
+        );
+        return ResponseEntity.ok(updated);
     }
 }
