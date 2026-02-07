@@ -1,22 +1,261 @@
-@keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+@import '../../../../../styles/theme';
+
+// ============================================
+// Hero Section Styles
+// ============================================
+
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  padding-top: 4rem; // Account for navbar
 }
 
-@keyframes fadeInUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
+// ============================================
+// Canvas Background
+// ============================================
+
+.hero-canvas {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
 }
 
-.animate-fadeIn {
-  animation: fadeIn 0.8s ease-out forwards;
+// ============================================
+// Dark Overlay for Readability
+// ============================================
+
+.hero-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.1) 50%,
+    var(--surface-ground) 100%
+  );
+  z-index: 10;
+
+  .dark & {
+    background: linear-gradient(
+      to bottom,
+      rgba(0, 0, 0, 0.3) 0%,
+      rgba(0, 0, 0, 0.5) 50%,
+      var(--surface-ground) 100%
+    );
+  }
 }
 
-.animate-fadeInUp {
-  animation: fadeInUp 0.8s ease-out forwards;
+// ============================================
+// Hero Content
+// ============================================
+
+.hero-content {
+  position: relative;
+  z-index: 20;
+  text-align: center;
+  padding: var(--spacing-md);
+  max-width: 56rem; // 896px
+  margin: 0 auto;
 }
 
-.animation-delay-200 { animation-delay: 0.2s; opacity: 0; }
-.animation-delay-400 { animation-delay: 0.4s; opacity: 0; }
-.animation-delay-600 { animation-delay: 0.6s; opacity: 0; }
-.animation-delay-800 { animation-delay: 0.8s; opacity: 0; }
+// ============================================
+// Avatar
+// ============================================
+
+.hero-avatar {
+  margin-bottom: var(--spacing-xl);
+  opacity: 0; // For animation
+}
+
+.hero-avatar-img {
+  width: 10rem; // 160px
+  height: 10rem;
+  border-radius: var(--radius-full);
+  margin: 0 auto;
+  border: 4px solid var(--color-primary-500);
+  box-shadow: var(--shadow-2xl);
+  object-fit: cover;
+  transition: transform var(--transition-base);
+
+  &:hover {
+    transform: scale(1.05);
+  }
+
+  @include mobile {
+    width: 8rem; // 128px
+    height: 8rem;
+  }
+}
+
+// ============================================
+// Typography
+// ============================================
+
+.hero-title {
+  @include font-heading;
+  font-size: clamp(2.5rem, 8vw, 4.5rem); // Responsive 40px-72px
+  margin-bottom: var(--spacing-md);
+  line-height: var(--line-height-tight);
+  opacity: 0; // For animation
+}
+
+.hero-subtitle {
+  font-size: clamp(1.25rem, 4vw, 2rem); // Responsive 20px-32px
+  font-weight: var(--font-weight-medium);
+  color: var(--color-primary-500);
+  margin-bottom: var(--spacing-lg);
+  opacity: 0; // For animation
+}
+
+.hero-tagline {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  max-width: 42rem; // 672px
+  margin: 0 auto var(--spacing-xl);
+  opacity: 0; // For animation
+}
+
+// ============================================
+// CTA Button
+// ============================================
+
+.hero-cta {
+  margin-bottom: var(--spacing-xl);
+  opacity: 0; // For animation
+}
+
+.hero-button {
+  @include button-base;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: var(--spacing-md) var(--spacing-2xl);
+  background: var(--color-primary-500);
+  color: var(--text-on-primary);
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  transition: all var(--transition-base);
+
+  &:hover {
+    background: var(--color-primary-600);
+    transform: translateY(-2px) scale(1.05);
+    box-shadow: var(--shadow-xl);
+  }
+
+  &:active {
+    transform: translateY(0) scale(1);
+  }
+
+  i {
+    font-size: var(--font-size-xl);
+  }
+}
+
+// ============================================
+// Social Links
+// ============================================
+
+.hero-social {
+  opacity: 0; // For animation
+}
+
+// ============================================
+// Scroll Indicator
+// ============================================
+
+.hero-scroll-indicator {
+  position: absolute;
+  bottom: var(--spacing-xl);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 20;
+  cursor: pointer;
+  animation: bounce 2s infinite;
+
+  i {
+    font-size: var(--font-size-2xl);
+    color: var(--text-muted);
+    transition: color var(--transition-fast);
+  }
+
+  &:hover i {
+    color: var(--color-primary-500);
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateX(-50%) translateY(0);
+  }
+  40% {
+    transform: translateX(-50%) translateY(-10px);
+  }
+  60% {
+    transform: translateX(-50%) translateY(-5px);
+  }
+}
+
+// Animation classes with proper opacity handling
+.animate-fade-in {
+  animation: fadeInAnimation 1s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUpAnimation 1s ease-out forwards;
+}
+
+@keyframes fadeInAnimation {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUpAnimation {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+// ============================================
+// Responsive Adjustments
+// ============================================
+
+@include mobile {
+  .hero-section {
+    min-height: 100svh; // Use svh for mobile browsers
+  }
+
+  .hero-content {
+    padding: var(--spacing-lg) var(--spacing-md);
+  }
+
+  .hero-button {
+    padding: var(--spacing-sm) var(--spacing-xl);
+    font-size: var(--font-size-base);
+  }
+}

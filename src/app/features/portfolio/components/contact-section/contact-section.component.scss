@@ -1,0 +1,205 @@
+@import '../../../../../styles/theme';
+
+// ============================================
+// Contact Section Styles
+// ============================================
+
+.contact-section {
+  @include section-spacing;
+  background: var(--surface-card);
+}
+
+.contact-container {
+  max-width: 42rem; // 672px - narrower for better form UX
+}
+
+// ============================================
+// Section Header
+// ============================================
+
+.contact-title {
+  @include font-heading;
+  font-size: clamp(2.25rem, 5vw, 3rem);
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.contact-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
+// ============================================
+// Messages
+// ============================================
+
+.contact-message {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  border-radius: var(--radius-lg);
+  margin-bottom: var(--spacing-xl);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  animation: slideDown 0.3s ease-out;
+
+  i {
+    font-size: var(--font-size-xl);
+  }
+
+  &.success {
+    background: rgba(16, 185, 129, 0.1);
+    color: var(--color-success);
+    border: 1px solid rgba(16, 185, 129, 0.2);
+  }
+
+  &.error {
+    background: rgba(239, 68, 68, 0.1);
+    color: var(--color-error);
+    border: 1px solid rgba(239, 68, 68, 0.2);
+  }
+}
+
+// ============================================
+// Contact Form
+// ============================================
+
+.contact-form {
+  @include card-base;
+  padding: var(--spacing-2xl);
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-lg);
+
+  @include mobile {
+    padding: var(--spacing-lg);
+  }
+}
+
+// ============================================
+// Form Fields
+// ============================================
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
+}
+
+.form-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  color: var(--text-primary);
+
+  .required {
+    color: var(--color-error);
+  }
+}
+
+.form-input {
+  @include input-base;
+  width: 100%;
+
+  &.invalid {
+    border-color: var(--color-error);
+
+    &:focus {
+      border-color: var(--color-error);
+      box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+    }
+  }
+}
+
+.form-error {
+  color: var(--color-error);
+  font-size: var(--font-size-sm);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+
+  &::before {
+    content: '⚠';
+  }
+}
+
+// ============================================
+// Submit Button
+// ============================================
+
+.form-submit {
+  @include button-base;
+  width: 100%;
+  padding: var(--spacing-md) var(--spacing-xl);
+  background: var(--color-primary-500);
+  color: var(--text-on-primary);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-semibold);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-top: var(--spacing-md);
+
+  &:hover:not(:disabled) {
+    background: var(--color-primary-600);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+  }
+
+  &:active:not(:disabled) {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================
+// PrimeNG Overrides
+// ============================================
+
+// Ensure PrimeNG inputs use theme variables
+::ng-deep {
+  .p-inputtext,
+  .p-inputtextarea {
+    @include input-base;
+    font-family: var(--font-family) !important;
+
+    &:enabled:focus {
+      outline: none;
+      border-color: var(--color-primary-500);
+      box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    &.invalid {
+      border-color: var(--color-error);
+
+      &:enabled:focus {
+        border-color: var(--color-error);
+        box-shadow: 0 0 0 3px rgba(239, 68, 68, 0.1);
+      }
+    }
+  }
+
+  .p-button {
+    font-family: var(--font-family) !important;
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

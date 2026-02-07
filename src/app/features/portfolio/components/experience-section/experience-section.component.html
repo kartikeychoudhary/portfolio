@@ -1,9 +1,86 @@
-<section id="experience" class="py-20 px-4 bg-surface-ground">
-  <div class="max-w-5xl mx-auto">
-    <app-section-header title="Experience" subtitle="My professional journey"></app-section-header>
+<section id="experience" class="experience-section">
+  <div class="container">
+    <!-- Section Header -->
+    <h2 class="experience-title">
+      Experience
+    </h2>
+    <p class="experience-subtitle">
+      My professional journey
+    </p>
 
-    <div *ngIf="experiences$ | async as experiences">
-      <app-experience-timeline [experiences]="experiences"></app-experience-timeline>
+    <div *ngIf="experiences$ | async as experiences" class="experience-content">
+      <!-- Horizontal Timeline -->
+      <div class="timeline-container">
+        <!-- Timeline Line -->
+        <div class="timeline-line"></div>
+
+        <!-- Timeline Markers -->
+        <div class="timeline-markers">
+          <div *ngFor="let exp of experiences; let i = index"
+               class="timeline-marker-wrapper"
+               (click)="selectExperience(i, exp)">
+            <!-- Marker Dot -->
+            <div class="timeline-marker"
+                 [class.active]="selectedIndex() === i">
+            </div>
+
+            <!-- Date Label -->
+            <div class="timeline-date"
+                 [class.active]="selectedIndex() === i">
+              {{ formatDate(exp.startDate) }}
+            </div>
+
+            <!-- Company Logo (shows on hover) -->
+            <div class="timeline-logo" *ngIf="exp.companyLogo">
+              <img [src]="exp.companyLogo"
+                   [alt]="exp.company">
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Experience Card -->
+      <div *ngIf="selectedExperience() as exp" class="experience-card">
+        <!-- Company & Role -->
+        <div class="experience-header">
+          <div class="experience-info">
+            <h3 class="experience-role">
+              {{ exp.role }}
+            </h3>
+            <p class="experience-company">
+              {{ exp.company }}
+            </p>
+            <p class="experience-location">
+              <i class="pi pi-map-marker"></i>
+              {{ exp.location }}
+            </p>
+          </div>
+          <img *ngIf="exp.companyLogo"
+               [src]="exp.companyLogo"
+               [alt]="exp.company"
+               class="experience-logo">
+        </div>
+
+        <!-- Duration -->
+        <p class="experience-duration">
+          {{ formatDate(exp.startDate) }} -
+          {{ exp.isCurrent ? 'Present' : formatDate(exp.endDate!) }}
+          · {{ calculateDuration(exp) }}
+        </p>
+
+        <!-- Description -->
+        <div class="experience-description"
+             [innerHTML]="exp.description">
+        </div>
+
+        <!-- Technologies -->
+        <div class="experience-technologies">
+          <span *ngFor="let tech of exp.technologies"
+                class="experience-tech-tag">
+            {{ tech }}
+          </span>
+        </div>
+      </div>
     </div>
   </div>
 </section>

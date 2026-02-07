@@ -1,2 +1,26 @@
-<router-outlet></router-outlet>
+<!-- Navbar - appears on all public pages -->
+<app-navbar></app-navbar>
+
+<!-- Main Content -->
+<main class="main-content">
+  <router-outlet></router-outlet>
+</main>
+
+<!-- Footer - appears on all public pages -->
+<footer class="site-footer">
+  <div class="container">
+    <div class="footer-content">
+      <p class="footer-text">
+        © {{ currentYear }} Built with ❤️ using Angular & PrimeNG
+      </p>
+      <div class="footer-links">
+        <a routerLink="/" class="footer-link">Home</a>
+        <a routerLink="/blog" class="footer-link">Blog</a>
+        <a routerLink="/admin" class="footer-link">Admin</a>
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- Scroll to Top Button -->
 <app-scroll-to-top></app-scroll-to-top>

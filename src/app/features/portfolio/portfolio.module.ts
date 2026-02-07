@@ -7,7 +7,6 @@ import { TextareaModule } from 'primeng/textarea';
 import { ProgressBarModule } from 'primeng/progressbar';
 
 import { PortfolioPageComponent } from './pages/portfolio-page/portfolio-page.component';
-import { NavbarComponent } from './components/navbar/navbar.component';
 import { HeroSectionComponent } from './components/hero-section/hero-section.component';
 import { SocialLinksComponent } from './components/social-links/social-links.component';
 import { SkillsSectionComponent } from './components/skills-section/skills-section.component';
@@ -21,7 +20,6 @@ import { ContactSectionComponent } from './components/contact-section/contact-se
 @NgModule({
   declarations: [
     PortfolioPageComponent,
-    NavbarComponent,
     HeroSectionComponent,
     SocialLinksComponent,
     SkillsSectionComponent,

@@ -7,4 +7,6 @@ import { Component, ChangeDetectionStrategy } from '@angular/core';
   styleUrls: ['./public-layout.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class PublicLayoutComponent { }
+export class PublicLayoutComponent {
+  currentYear = new Date().getFullYear();
+}

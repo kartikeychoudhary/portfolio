@@ -1,0 +1,291 @@
+@import '../../../../../styles/theme';
+
+// ============================================
+// Projects Section Styles
+// ============================================
+
+.projects-section {
+  @include section-spacing;
+  background: var(--surface-ground);
+}
+
+// ============================================
+// Section Header
+// ============================================
+
+.projects-title {
+  @include font-heading;
+  font-size: clamp(2.25rem, 5vw, 3rem);
+  text-align: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.projects-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--text-secondary);
+  text-align: center;
+  margin-bottom: var(--spacing-3xl);
+}
+
+// ============================================
+// Scrollable Container
+// ============================================
+
+.projects-scroll-wrapper {
+  position: relative;
+  max-width: 100%;
+  margin: 0 auto;
+}
+
+.scroll-button {
+  @include button-base;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 10;
+  width: 3rem; // 48px
+  height: 3rem;
+  background: var(--surface-card);
+  color: var(--text-primary);
+  border-radius: var(--radius-full);
+  box-shadow: var(--shadow-lg);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+
+  &:hover {
+    background: var(--color-primary-500);
+    color: var(--text-on-primary);
+    transform: translateY(-50%) scale(1.1);
+  }
+
+  i {
+    font-size: var(--font-size-xl);
+  }
+
+  @include mobile {
+    display: none; // Hide on mobile, rely on touch scrolling
+  }
+}
+
+.scroll-button-left {
+  left: -1.5rem;
+}
+
+.scroll-button-right {
+  right: -1.5rem;
+}
+
+// ============================================
+// Projects Container
+// ============================================
+
+.projects-container {
+  display: flex;
+  gap: var(--spacing-lg);
+  overflow-x: auto;
+  scroll-behavior: smooth;
+  padding-bottom: var(--spacing-md);
+
+  // Hide scrollbar
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  @include mobile {
+    gap: var(--spacing-md);
+    padding: 0 var(--spacing-md) var(--spacing-md);
+  }
+}
+
+// ============================================
+// Project Card
+// ============================================
+
+.project-card {
+  @include card-base;
+  flex-shrink: 0;
+  width: 350px;
+  overflow: hidden;
+  transition: all var(--transition-base);
+
+  &:hover {
+    @include card-hover;
+
+    .project-image img {
+      transform: scale(1.1);
+    }
+
+    .project-overlay {
+      opacity: 0.7;
+    }
+  }
+
+  @include mobile {
+    width: 300px;
+  }
+}
+
+// ============================================
+// Project Image
+// ============================================
+
+.project-image {
+  position: relative;
+  height: 12rem; // 192px
+  overflow: hidden;
+  background: var(--surface-border);
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform var(--transition-slow);
+  }
+}
+
+.project-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.6) 0%,
+    transparent 100%
+  );
+  opacity: 0.5;
+  transition: opacity var(--transition-base);
+}
+
+// ============================================
+// Project Content
+// ============================================
+
+.project-content {
+  padding: var(--spacing-lg);
+}
+
+.project-title {
+  @include font-heading;
+  font-size: var(--font-size-xl);
+  margin-bottom: var(--spacing-sm);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.project-description {
+  font-size: var(--font-size-sm);
+  color: var(--text-secondary);
+  line-height: var(--line-height-relaxed);
+  margin-bottom: var(--spacing-md);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 4.5rem; // Reserve space for 3 lines
+}
+
+// ============================================
+// Technologies
+// ============================================
+
+.project-technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-xs);
+  margin-bottom: var(--spacing-md);
+}
+
+.project-tech-tag {
+  padding: var(--spacing-xs) var(--spacing-sm);
+  font-size: var(--font-size-xs);
+  background: var(--surface-ground);
+  color: var(--text-secondary);
+  border-radius: var(--radius-md);
+  font-weight: var(--font-weight-medium);
+
+  &.more {
+    color: var(--text-muted);
+  }
+}
+
+// ============================================
+// Project Links
+// ============================================
+
+.project-links {
+  display: flex;
+  gap: var(--spacing-sm);
+}
+
+.project-link {
+  @include button-base;
+  display: inline-flex;
+  align-items: center;
+  gap: var(--spacing-xs);
+  padding: var(--spacing-sm) var(--spacing-md);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-md);
+  text-decoration: none;
+  transition: all var(--transition-fast);
+
+  &.primary {
+    flex: 1;
+    justify-content: center;
+    background: var(--color-primary-500);
+    color: var(--text-on-primary);
+
+    &:hover {
+      background: var(--color-primary-600);
+      transform: translateY(-2px);
+    }
+  }
+
+  &.secondary {
+    padding: var(--spacing-sm) var(--spacing-md);
+    background: var(--surface-ground);
+    color: var(--text-secondary);
+    border: 1px solid var(--surface-border);
+
+    &:hover {
+      color: var(--color-primary-500);
+      border-color: var(--color-primary-500);
+      transform: translateY(-2px);
+    }
+  }
+
+  i {
+    font-size: var(--font-size-base);
+  }
+}
+
+// ============================================
+// Animations
+// ============================================
+
+.project-card {
+  animation: fadeInScale 0.5s ease-out backwards;
+
+  @for $i from 1 through 20 {
+    &:nth-child(#{$i}) {
+      animation-delay: #{$i * 0.1}s;
+    }
+  }
+}
+
+@keyframes fadeInScale {
+  from {
+    opacity: 0;
+    transform: scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}

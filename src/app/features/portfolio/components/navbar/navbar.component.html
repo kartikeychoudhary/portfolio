@@ -1,47 +1,79 @@
-<nav class="fixed top-0 left-0 right-0 z-50 transition-all duration-300"
-     [class.bg-surface-card]="isScrolled"
-     [class.shadow-md]="isScrolled"
-     [class.bg-transparent]="!isScrolled">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex justify-between items-center h-16">
-      <a class="text-xl font-bold cursor-pointer" tabindex="0" role="button"
-         (click)="scrollTo('hero')" (keydown.enter)="scrollTo('hero')"
-         [style.color]="'var(--p-primary-color)'">
-        KC
+<nav class="navbar"
+     [class.scrolled]="isScrolled()">
+  <div class="navbar-container">
+    <div class="navbar-content">
+      <!-- Logo/Name -->
+      <a (click)="scrollTo('home')"
+         (keydown.enter)="scrollTo('home')"
+         class="navbar-logo"
+         tabindex="0"
+         role="button"
+         aria-label="Go to home">
+        <span class="text-gradient-primary">KC</span>
       </a>
 
-      <!-- Desktop Nav -->
-      <div class="hidden md:flex items-center gap-6">
-        <a *ngFor="let link of navLinks"
-           class="cursor-pointer hover:text-primary transition-colors font-medium"
-           tabindex="0" role="button" (click)="scrollTo(link.fragment)" (keydown.enter)="scrollTo(link.fragment)">
-          {{ link.label }}
-        </a>
-        <a routerLink="/blog" class="cursor-pointer hover:text-primary transition-colors font-medium">
-          Blog
-        </a>
-        <app-theme-toggle></app-theme-toggle>
-      </div>
+      <!-- Desktop Navigation -->
+      <ul class="navbar-menu-desktop">
+        <li *ngFor="let section of sections">
+          <a (click)="scrollTo(section.id)"
+             (keydown.enter)="scrollTo(section.id)"
+             class="navbar-link"
+             [class.active]="activeSection() === section.id"
+             tabindex="0"
+             role="button"
+             [attr.aria-label]="'Navigate to ' + section.label"
+             [attr.aria-current]="activeSection() === section.id ? 'page' : null">
+            {{ section.label }}
+          </a>
+        </li>
+        <li>
+          <a routerLink="/blog"
+             class="navbar-link"
+             [attr.aria-label]="'Navigate to Blog'">
+            Blog
+          </a>
+        </li>
+        <li class="navbar-theme-toggle">
+          <app-theme-toggle></app-theme-toggle>
+        </li>
+      </ul>
 
-      <!-- Mobile Hamburger -->
-      <div class="md:hidden flex items-center gap-2">
+      <!-- Mobile Menu Button -->
+      <div class="navbar-mobile-controls">
         <app-theme-toggle></app-theme-toggle>
-        <p-button icon="pi pi-bars" [text]="true" (click)="toggleMobileMenu()"></p-button>
+        <button class="navbar-mobile-toggle"
+                (click)="toggleMobileMenu()"
+                [attr.aria-label]="isMobileMenuOpen() ? 'Close menu' : 'Open menu'"
+                [attr.aria-expanded]="isMobileMenuOpen()">
+          <i class="pi" [class.pi-bars]="!isMobileMenuOpen()" [class.pi-times]="isMobileMenuOpen()"></i>
+        </button>
       </div>
     </div>
-  </div>
 
-  <!-- Mobile Menu -->
-  <div *ngIf="isMobileMenuOpen" class="md:hidden bg-surface-card border-t border-surface-border">
-    <div class="px-4 py-2 space-y-2">
-      <a *ngFor="let link of navLinks"
-         class="block py-2 cursor-pointer hover:text-primary transition-colors"
-         tabindex="0" role="button" (click)="scrollTo(link.fragment)" (keydown.enter)="scrollTo(link.fragment)">
-        {{ link.label }}
-      </a>
-      <a routerLink="/blog" class="block py-2 cursor-pointer hover:text-primary transition-colors">
-        Blog
-      </a>
+    <!-- Mobile Menu -->
+    <div class="navbar-menu-mobile"
+         [class.open]="isMobileMenuOpen()">
+      <ul class="navbar-menu-mobile-list">
+        <li *ngFor="let section of sections">
+          <a (click)="scrollTo(section.id)"
+             (keydown.enter)="scrollTo(section.id)"
+             class="navbar-mobile-link"
+             [class.active]="activeSection() === section.id"
+             tabindex="0"
+             role="button"
+             [attr.aria-label]="'Navigate to ' + section.label">
+            {{ section.label }}
+          </a>
+        </li>
+        <li>
+          <a routerLink="/blog"
+             (click)="closeMobileMenu()"
+             class="navbar-mobile-link"
+             [attr.aria-label]="'Navigate to Blog'">
+            Blog
+          </a>
+        </li>
+      </ul>
     </div>
   </div>
 </nav>

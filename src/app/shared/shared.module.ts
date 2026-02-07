@@ -14,6 +14,7 @@ import { ScrollToTopComponent } from './components/scroll-to-top/scroll-to-top.c
 import { LoadingSpinnerComponent } from './components/loading-spinner/loading-spinner.component';
 import { SafeHtmlPipe } from './pipes/safe-html.pipe';
 import { TimeAgoPipe } from './pipes/time-ago.pipe';
+import { NavbarComponent } from '../features/portfolio/components/navbar/navbar.component';
 
 /**
  * Shared module containing reusable components, pipes, and directives.
@@ -21,6 +22,7 @@ import { TimeAgoPipe } from './pipes/time-ago.pipe';
  */
 @NgModule({
   declarations: [
+    NavbarComponent,
     ThemeToggleComponent,
     SectionHeaderComponent,
     ScrollToTopComponent,
@@ -40,6 +42,7 @@ import { TimeAgoPipe } from './pipes/time-ago.pipe';
     RouterModule,
     FormsModule,
     ReactiveFormsModule,
+    NavbarComponent,
     ThemeToggleComponent,
     SectionHeaderComponent,
     ScrollToTopComponent,
