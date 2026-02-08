@@ -38,15 +38,7 @@ export class BlogService {
    * @returns Observable of BlogDto
    */
   getBlogBySlug(slug: string): Observable<BlogDto> {
-    return this.api.get<BlogDto[]>('/blogs').pipe(
-      map(blogs => {
-        const blog = blogs.find(b => b.slug === slug);
-        if (!blog) {
-          throw new Error(`Blog post not found: ${slug}`);
-        }
-        return blog;
-      })
-    );
+    return this.api.get<BlogDto>(`/blogs/${slug}`);
   }
 
   /**

@@ -87,32 +87,89 @@
           ></textarea>
         </div>
 
-        <!-- Content -->
+        <!-- Content (Quill Rich Text Editor) -->
         <div>
-          <label for="blog-content" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Content (HTML)
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Content <span class="text-red-500">*</span>
           </label>
-          <textarea
-            id="blog-content"
+          <quill-editor
             formControlName="content"
-            rows="10"
-            placeholder="Write your blog post content in HTML..."
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 font-mono focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors resize-y"
-          ></textarea>
+            [modules]="quillModules"
+            placeholder="Write your blog post content..."
+            class="quill-editor-wrapper"
+          ></quill-editor>
+          <p
+            *ngIf="blogForm.get('content')?.touched && blogForm.get('content')?.hasError('required')"
+            class="mt-1 text-xs text-red-500"
+          >
+            Content is required.
+          </p>
+          <!-- Character Counter -->
+          <div class="mt-2">
+            <div class="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400 mb-1">
+              <span>{{ contentLength | number }} / {{ CONTENT_MAX_LENGTH | number }} bytes</span>
+              <span
+                [class.text-yellow-500]="contentPercent >= 75 && contentPercent < 90"
+                [class.text-red-500]="contentPercent >= 90"
+              >
+                {{ contentPercent | number:'1.0-0' }}%
+              </span>
+            </div>
+            <div class="content-progress-track">
+              <div
+                class="content-progress-fill"
+                [style.width.%]="contentPercent"
+                [class.warn]="contentPercent >= 75 && contentPercent < 90"
+                [class.danger]="contentPercent >= 90"
+              ></div>
+            </div>
+          </div>
         </div>
 
-        <!-- Cover Image URL -->
+        <!-- Cover Image Upload -->
         <div>
-          <label for="blog-cover" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-            Cover Image URL
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Cover Image
           </label>
+
+          <!-- Existing cover image (when editing) -->
+          <div *ngIf="selectedBlog?.coverImage && !coverImagePreview" class="cover-image-current mb-3">
+            <img [src]="selectedBlog!.coverImage" alt="Current cover image" class="cover-image-preview" />
+            <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">Current cover image. Upload a new one to replace it.</p>
+          </div>
+
+          <!-- New image preview -->
+          <div *ngIf="coverImagePreview" class="cover-image-current mb-3">
+            <img [src]="coverImagePreview" alt="Cover image preview" class="cover-image-preview" />
+            <button
+              type="button"
+              (click)="removeCoverImage()"
+              class="mt-2 inline-flex items-center gap-1 text-xs text-red-500 hover:text-red-700 transition-colors"
+            >
+              <i class="fa-solid fa-times"></i>
+              Remove
+            </button>
+          </div>
+
+          <!-- File input -->
           <input
-            id="blog-cover"
-            type="text"
-            formControlName="coverImage"
-            placeholder="https://example.com/image.jpg"
-            class="w-full rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-4 py-2.5 text-sm text-gray-900 dark:text-white placeholder-gray-400 dark:placeholder-gray-500 focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500 dark:focus:ring-indigo-400 focus:outline-none transition-colors"
+            type="file"
+            accept="image/jpeg,image/png,image/webp"
+            (change)="onCoverImageSelect($event)"
+            class="block w-full text-sm text-gray-500 dark:text-gray-400
+                   file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0
+                   file:text-sm file:font-medium
+                   file:bg-indigo-50 file:text-indigo-700
+                   dark:file:bg-indigo-900/30 dark:file:text-indigo-400
+                   hover:file:bg-indigo-100 dark:hover:file:bg-indigo-900/50
+                   file:cursor-pointer file:transition-colors"
           />
+          <p class="mt-1 text-xs text-gray-400 dark:text-gray-500">JPEG, PNG, or WebP. Max 2MB.</p>
+
+          <!-- Error message -->
+          <p *ngIf="coverImageError" class="mt-1 text-xs text-red-500">
+            {{ coverImageError }}
+          </p>
         </div>
 
         <!-- Tags -->
@@ -147,15 +204,18 @@
         <div class="flex items-center gap-3 pt-2">
           <button
             type="submit"
-            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
+            [disabled]="saving"
+            class="inline-flex items-center gap-2 rounded-lg bg-indigo-600 px-5 py-2.5 text-sm font-medium text-white shadow-sm hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            <i class="fa-solid fa-check"></i>
-            {{ selectedBlog ? 'Update Post' : 'Create Post' }}
+            <i *ngIf="!saving" class="fa-solid fa-check"></i>
+            <i *ngIf="saving" class="fa-solid fa-spinner fa-spin"></i>
+            {{ saving ? 'Saving...' : (selectedBlog ? 'Update Post' : 'Create Post') }}
           </button>
           <button
             type="button"
             (click)="cancelEdit()"
-            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors"
+            [disabled]="saving"
+            class="inline-flex items-center gap-2 rounded-lg border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 px-5 py-2.5 text-sm font-medium text-gray-700 dark:text-gray-300 shadow-sm hover:bg-gray-50 dark:hover:bg-gray-600 focus:outline-none focus:ring-2 focus:ring-gray-300 dark:focus:ring-gray-500 focus:ring-offset-2 dark:focus:ring-offset-gray-800 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
           >
             Cancel
           </button>
@@ -217,7 +277,7 @@
 
               <!-- Date -->
               <td class="px-6 py-4 text-gray-500 dark:text-gray-400 whitespace-nowrap">
-                {{ blog.createdAt | date:'mediumDate' }}
+                {{ (blog.publishedDate || blog.createdAt) | date:'mediumDate' }}
               </td>
 
               <!-- Actions -->

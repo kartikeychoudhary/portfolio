@@ -13,6 +13,7 @@ import java.util.List;
 public interface ProfileMapper {
 
     @Mapping(target = "avatarBase64", expression = "java(encodeAvatar(profile.getAvatarData()))")
+    @Mapping(target = "resumeBase64", expression = "java(encodeResume(profile.getResumeData()))")
     ProfileDto toDto(Profile profile);
 
     @Mapping(target = "socialLinks", ignore = true)
@@ -20,6 +21,10 @@ public interface ProfileMapper {
     @Mapping(target = "avatarContentType", ignore = true)
     @Mapping(target = "avatarFileSize", ignore = true)
     @Mapping(target = "avatarUpdatedAt", ignore = true)
+    @Mapping(target = "resumeData", ignore = true)
+    @Mapping(target = "resumeContentType", ignore = true)
+    @Mapping(target = "resumeFileSize", ignore = true)
+    @Mapping(target = "resumeUpdatedAt", ignore = true)
     Profile toEntity(ProfileDto dto);
 
     List<ProfileDto> toDtoList(List<Profile> profiles);
@@ -32,6 +37,10 @@ public interface ProfileMapper {
     @Mapping(target = "avatarContentType", ignore = true)
     @Mapping(target = "avatarFileSize", ignore = true)
     @Mapping(target = "avatarUpdatedAt", ignore = true)
+    @Mapping(target = "resumeData", ignore = true)
+    @Mapping(target = "resumeContentType", ignore = true)
+    @Mapping(target = "resumeFileSize", ignore = true)
+    @Mapping(target = "resumeUpdatedAt", ignore = true)
     void updateEntityFromDto(ProfileDto dto, @MappingTarget Profile profile);
 
     // Helper method for Base64 encoding
@@ -40,6 +49,14 @@ public interface ProfileMapper {
             return null;
         }
         return Base64.getEncoder().encodeToString(avatarData);
+    }
+
+    // Helper method for Base64 encoding resume
+    default String encodeResume(byte[] resumeData) {
+        if (resumeData == null || resumeData.length == 0) {
+            return null;
+        }
+        return Base64.getEncoder().encodeToString(resumeData);
     }
 
     // Helper method for Base64 decoding

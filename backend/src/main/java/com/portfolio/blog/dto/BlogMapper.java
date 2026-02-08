@@ -11,6 +11,9 @@ public interface BlogMapper {
     BlogDto toDto(Blog blog);
 
     @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "coverImageData", ignore = true)
+    @Mapping(target = "coverImageContentType", ignore = true)
+    @Mapping(target = "coverImageFileSize", ignore = true)
     Blog toEntity(BlogDto dto);
 
     @AfterMapping
@@ -24,6 +27,11 @@ public interface BlogMapper {
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
     @Mapping(target = "tags", ignore = true)
+    @Mapping(target = "publishedDate", ignore = true)
+    @Mapping(target = "coverImage", ignore = true)
+    @Mapping(target = "coverImageData", ignore = true)
+    @Mapping(target = "coverImageContentType", ignore = true)
+    @Mapping(target = "coverImageFileSize", ignore = true)
     void updateEntityFromDto(BlogDto dto, @MappingTarget Blog blog);
 
     @AfterMapping

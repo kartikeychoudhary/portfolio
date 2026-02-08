@@ -48,6 +48,19 @@ public class Project {
     @Column(name = "image_url", length = 500)
     private String imageUrl;
 
+    @Lob
+    @Column(name = "thumbnail_data", columnDefinition = "LONGBLOB")
+    private byte[] thumbnailData;
+
+    @Column(name = "thumbnail_content_type", length = 50)
+    private String thumbnailContentType;
+
+    @Column(name = "thumbnail_file_size")
+    private Integer thumbnailFileSize;
+
+    @Column(name = "thumbnail_updated_at")
+    private LocalDateTime thumbnailUpdatedAt;
+
     @Column(name = "project_url", length = 500)
     private String projectUrl;
 

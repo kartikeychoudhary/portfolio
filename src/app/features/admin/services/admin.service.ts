@@ -53,7 +53,7 @@ export class AdminService {
    * @returns Observable of BlogDto array
    */
   getBlogs(): Observable<BlogDto[]> {
-    return this.api.get<BlogDto[]>('/blogs');
+    return this.api.get<BlogDto[]>('/blogs/all');
   }
 
   /**
@@ -82,6 +82,20 @@ export class AdminService {
    */
   deleteBlog(id: string): Observable<void> {
     return this.api.delete<void>(`/blogs/${id}`);
+  }
+
+  /**
+   * Uploads a cover image for a blog post.
+   * @param blogId - The blog ID
+   * @param imageBase64 - Base64-encoded image data (without data URI prefix)
+   * @param contentType - MIME type (image/jpeg, image/png, image/webp)
+   * @returns Observable of updated BlogDto
+   */
+  uploadBlogCoverImage(blogId: string, imageBase64: string, contentType: string): Observable<BlogDto> {
+    return this.api.post<BlogDto>(`/blogs/${blogId}/cover-image`, {
+      imageBase64,
+      contentType
+    });
   }
 
   // ── Profile ───────────────────────────────────────────────
@@ -183,5 +197,19 @@ export class AdminService {
    */
   deleteProject(id: string): Observable<void> {
     return this.api.delete<void>(`/projects/${id}`);
+  }
+
+  /**
+   * Uploads a thumbnail image for a project.
+   * @param projectId - The project ID
+   * @param thumbnailBase64 - Base64-encoded image data (without data URI prefix)
+   * @param contentType - MIME type (image/jpeg, image/png, image/webp)
+   * @returns Observable of updated ProjectDto
+   */
+  uploadProjectThumbnail(projectId: string, thumbnailBase64: string, contentType: string): Observable<ProjectDto> {
+    return this.api.post<ProjectDto>(`/projects/${projectId}/thumbnail`, {
+      thumbnailBase64,
+      contentType
+    });
   }
 }

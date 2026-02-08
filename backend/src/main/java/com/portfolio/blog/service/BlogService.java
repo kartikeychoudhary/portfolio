@@ -12,4 +12,7 @@ public interface BlogService {
     BlogDto updateBlog(String id, BlogDto blogDto);
     void deleteBlog(String id);
     List<BlogDto> getPublishedBlogs();
+    BlogDto uploadCoverImage(String id, String base64Data, String contentType);
+    byte[] getCoverImageData(String id);
+    String getCoverImageContentType(String id);
 }

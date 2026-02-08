@@ -28,11 +28,14 @@ class ProjectServiceTest {
     @Mock
     private ProjectMapper projectMapper;
 
+    @Mock
+    private ProjectImageValidationService imageValidationService;
+
     private ProjectServiceImpl projectService;
 
     @BeforeEach
     void setUp() {
-        projectService = new ProjectServiceImpl(projectRepository, projectMapper);
+        projectService = new ProjectServiceImpl(projectRepository, projectMapper, imageValidationService);
     }
 
     @Test

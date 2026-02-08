@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,11 +18,14 @@ public class BlogServiceImpl implements BlogService {
 
     private final BlogRepository blogRepository;
     private final BlogMapper blogMapper;
+    private final BlogImageValidationService imageValidationService;
 
     @Autowired
-    public BlogServiceImpl(BlogRepository blogRepository, BlogMapper blogMapper) {
+    public BlogServiceImpl(BlogRepository blogRepository, BlogMapper blogMapper,
+                           BlogImageValidationService imageValidationService) {
         this.blogRepository = blogRepository;
         this.blogMapper = blogMapper;
+        this.imageValidationService = imageValidationService;
     }
 
     @Override
@@ -50,6 +54,12 @@ public class BlogServiceImpl implements BlogService {
     @Override
     public BlogDto createBlog(BlogDto blogDto) {
         Blog blog = blogMapper.toEntity(blogDto);
+
+        // Auto-set publishedDate when publishing for the first time
+        if (blog.isPublished() && blog.getPublishedDate() == null) {
+            blog.setPublishedDate(LocalDateTime.now());
+        }
+
         Blog savedBlog = blogRepository.save(blog);
         return blogMapper.toDto(savedBlog);
     }
@@ -59,7 +69,14 @@ public class BlogServiceImpl implements BlogService {
         Blog blog = blogRepository.findById(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id));
 
+        boolean wasPublished = blog.isPublished();
         blogMapper.updateEntityFromDto(blogDto, blog);
+
+        // Auto-set publishedDate when publishing for the first time
+        if (blog.isPublished() && !wasPublished && blog.getPublishedDate() == null) {
+            blog.setPublishedDate(LocalDateTime.now());
+        }
+
         Blog updatedBlog = blogRepository.save(blog);
         return blogMapper.toDto(updatedBlog);
     }
@@ -76,5 +93,43 @@ public class BlogServiceImpl implements BlogService {
     public List<BlogDto> getPublishedBlogs() {
         List<Blog> blogs = blogRepository.findPublishedBlogs();
         return blogMapper.toDtoList(blogs);
+    }
+
+    @Override
+    public BlogDto uploadCoverImage(String id, String base64Data, String contentType) {
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id));
+
+        byte[] imageData = imageValidationService.validateAndDecode(base64Data, contentType);
+
+        blog.setCoverImageData(imageData);
+        blog.setCoverImageContentType(contentType);
+        blog.setCoverImageFileSize(imageData.length);
+        blog.setCoverImage("/api/blogs/" + id + "/cover-image");
+
+        Blog updatedBlog = blogRepository.save(blog);
+        return blogMapper.toDto(updatedBlog);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public byte[] getCoverImageData(String id) {
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id));
+
+        if (blog.getCoverImageData() == null) {
+            throw new ResourceNotFoundException("Blog", "coverImage", id);
+        }
+
+        return blog.getCoverImageData();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String getCoverImageContentType(String id) {
+        Blog blog = blogRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Blog", "id", id));
+
+        return blog.getCoverImageContentType();
     }
 }

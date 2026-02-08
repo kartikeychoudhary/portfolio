@@ -89,3 +89,7 @@ networks:
 volumes:
   mysql_data:
     driver: local
+    # Fixed name ensures data persists regardless of which directory you run from.
+    # Data survives 'docker compose up --build' and 'docker compose down'.
+    # ONLY 'docker compose down -v' will delete this volume and wipe the database.
+    name: portfolio_mysql_data

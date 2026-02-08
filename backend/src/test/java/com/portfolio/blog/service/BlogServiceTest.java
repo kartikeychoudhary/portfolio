@@ -29,11 +29,14 @@ class BlogServiceTest {
     @Mock
     private BlogMapper blogMapper;
 
+    @Mock
+    private BlogImageValidationService blogImageValidationService;
+
     private BlogServiceImpl blogService;
 
     @BeforeEach
     void setUp() {
-        blogService = new BlogServiceImpl(blogRepository, blogMapper);
+        blogService = new BlogServiceImpl(blogRepository, blogMapper, blogImageValidationService);
     }
 
     @Test

@@ -114,6 +114,57 @@
             </small>
           </div>
 
+          <!-- Email -->
+          <div class="flex flex-col gap-1">
+            <label for="email" class="text-sm font-medium text-gray-700 dark:text-gray-300">Email <span class="text-red-500">*</span></label>
+            <input
+              id="email"
+              type="email"
+              pInputText
+              formControlName="email"
+              placeholder="you@example.com"
+              class="w-full"
+            />
+            <small
+              *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.hasError('required')"
+              class="text-red-500 dark:text-red-400 text-xs"
+            >
+              Email is required.
+            </small>
+            <small
+              *ngIf="profileForm.get('email')?.touched && profileForm.get('email')?.hasError('email')"
+              class="text-red-500 dark:text-red-400 text-xs"
+            >
+              Please enter a valid email.
+            </small>
+          </div>
+
+          <!-- Phone & Location (side by side) -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div class="flex flex-col gap-1">
+              <label for="phone" class="text-sm font-medium text-gray-700 dark:text-gray-300">Phone</label>
+              <input
+                id="phone"
+                type="text"
+                pInputText
+                formControlName="phone"
+                placeholder="+1 (555) 000-0000"
+                class="w-full"
+              />
+            </div>
+            <div class="flex flex-col gap-1">
+              <label for="location" class="text-sm font-medium text-gray-700 dark:text-gray-300">Location</label>
+              <input
+                id="location"
+                type="text"
+                pInputText
+                formControlName="location"
+                placeholder="City, Country"
+                class="w-full"
+              />
+            </div>
+          </div>
+
           <!-- Tagline -->
           <div class="flex flex-col gap-1">
             <label for="tagline" class="text-sm font-medium text-gray-700 dark:text-gray-300">Tagline</label>
@@ -153,30 +204,46 @@
             </small>
           </div>
 
-          <!-- Avatar URL -->
+          <!-- Resume PDF Upload -->
           <div class="flex flex-col gap-1">
-            <label for="avatarUrl" class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatar URL</label>
-            <input
-              id="avatarUrl"
-              type="text"
-              pInputText
-              formControlName="avatarUrl"
-              placeholder="https://example.com/avatar.jpg"
-              class="w-full"
-            />
-          </div>
-
-          <!-- Resume URL -->
-          <div class="flex flex-col gap-1">
-            <label for="resumeUrl" class="text-sm font-medium text-gray-700 dark:text-gray-300">Resume URL</label>
-            <input
-              id="resumeUrl"
-              type="text"
-              pInputText
-              formControlName="resumeUrl"
-              placeholder="https://example.com/resume.pdf"
-              class="w-full"
-            />
+            <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Resume PDF</label>
+            <div class="p-4 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700">
+              <!-- Current resume info -->
+              <div *ngIf="getResumeUrl()" class="flex items-center gap-3 mb-3">
+                <i class="fa-solid fa-file-pdf text-red-500 text-xl"></i>
+                <div class="flex-1">
+                  <span class="text-sm text-gray-700 dark:text-gray-300">Resume uploaded</span>
+                  <span *ngIf="currentProfile?.resumeFileSize" class="text-xs text-gray-500 dark:text-gray-400 ml-2">
+                    ({{ formatFileSize(currentProfile?.resumeFileSize) }})
+                  </span>
+                </div>
+                <a
+                  [href]="getResumeUrl()"
+                  target="_blank"
+                  class="text-sm text-indigo-600 dark:text-indigo-400 hover:underline"
+                >
+                  <i class="fa-solid fa-external-link mr-1"></i>View
+                </a>
+              </div>
+              <!-- Upload button -->
+              <div class="flex items-center gap-3">
+                <label
+                  for="resumeFileInput"
+                  class="cursor-pointer inline-flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-medium rounded-md transition-colors"
+                >
+                  <i class="fa-solid fa-upload"></i>
+                  {{ getResumeUrl() ? 'Replace Resume' : 'Upload Resume' }}
+                </label>
+                <input
+                  id="resumeFileInput"
+                  type="file"
+                  accept=".pdf,application/pdf"
+                  class="hidden"
+                  (change)="onResumeFileSelected($event)"
+                />
+                <span class="text-xs text-gray-500 dark:text-gray-400">PDF only, max 10MB</span>
+              </div>
+            </div>
           </div>
 
           <!-- Save Button -->
@@ -536,10 +603,37 @@
                 Title is required.
               </small>
             </div>
-            <!-- Thumbnail URL -->
+            <!-- Thumbnail Image Upload -->
             <div class="flex flex-col gap-1">
-              <label for="projThumbnail" class="text-sm font-medium text-gray-700 dark:text-gray-300">Thumbnail URL</label>
-              <input id="projThumbnail" type="text" pInputText formControlName="thumbnailUrl" placeholder="https://..." class="w-full" />
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Thumbnail Image</label>
+              <div class="p-3 border border-gray-300 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700">
+                <!-- Preview -->
+                <div *ngIf="getPendingThumbnailPreview()" class="mb-2">
+                  <img
+                    [src]="getPendingThumbnailPreview()"
+                    alt="Thumbnail preview"
+                    class="h-20 w-auto rounded object-cover"
+                  />
+                </div>
+                <!-- Upload button -->
+                <div class="flex items-center gap-2">
+                  <label
+                    for="thumbnailFileInput"
+                    class="cursor-pointer inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-md transition-colors"
+                  >
+                    <i class="fa-solid fa-upload"></i>
+                    {{ getPendingThumbnailPreview() ? 'Replace' : 'Upload' }}
+                  </label>
+                  <input
+                    id="thumbnailFileInput"
+                    type="file"
+                    accept="image/jpeg,image/png,image/webp"
+                    class="hidden"
+                    (change)="onThumbnailFileSelected($event)"
+                  />
+                  <span class="text-xs text-gray-500 dark:text-gray-400">Max 2MB</span>
+                </div>
+              </div>
             </div>
             <!-- Live URL -->
             <div class="flex flex-col gap-1">
@@ -606,13 +700,13 @@
           <!-- Thumbnail -->
           <div class="h-40 bg-gray-100 dark:bg-gray-700 overflow-hidden">
             <img
-              *ngIf="project.thumbnailUrl"
-              [src]="project.thumbnailUrl"
+              *ngIf="getThumbnailUrl(project)"
+              [src]="getThumbnailUrl(project)"
               [alt]="project.title"
               class="w-full h-full object-cover"
             />
             <div
-              *ngIf="!project.thumbnailUrl"
+              *ngIf="!getThumbnailUrl(project)"
               class="w-full h-full flex items-center justify-center"
             >
               <i class="fa-solid fa-image text-3xl text-gray-400 dark:text-gray-500"></i>

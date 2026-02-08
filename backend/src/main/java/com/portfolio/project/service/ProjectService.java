@@ -11,4 +11,5 @@ public interface ProjectService {
     ProjectDto updateProject(String id, ProjectDto projectDto);
     void deleteProject(String id);
     List<ProjectDto> getFeaturedProjects();
+    ProjectDto updateThumbnail(String projectId, String thumbnailBase64, String contentType);
 }

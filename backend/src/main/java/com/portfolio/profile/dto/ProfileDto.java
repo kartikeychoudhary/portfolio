@@ -45,6 +45,15 @@ public class ProfileDto {
 
     private String resumeUrl;
 
+    @JsonProperty("resumeBase64")
+    private String resumeBase64;
+
+    @JsonProperty("resumeContentType")
+    private String resumeContentType;
+
+    @JsonProperty("resumeFileSize")
+    private Integer resumeFileSize;
+
     @Builder.Default
     private List<SocialLinkDto> socialLinks = new ArrayList<>();
 }

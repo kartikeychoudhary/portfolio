@@ -1,4 +1,5 @@
 import { Component, ChangeDetectionStrategy, HostListener, ChangeDetectorRef, signal } from '@angular/core';
+import { Router } from '@angular/router';
 import { ThemeService } from '../../../../core/services/theme.service';
 import { ScrollUtilityService } from '../../../../core/services/scroll-utility.service';
 
@@ -26,7 +27,8 @@ export class NavbarComponent {
   constructor(
     public themeService: ThemeService,
     private cdr: ChangeDetectorRef,
-    private scrollUtility: ScrollUtilityService
+    private scrollUtility: ScrollUtilityService,
+    private router: Router
   ) {}
 
   @HostListener('window:scroll')
@@ -54,8 +56,16 @@ export class NavbarComponent {
   }
 
   scrollTo(sectionId: string): void {
-    this.scrollUtility.scrollToSection(sectionId);
     this.closeMobileMenu();
+
+    // If not on the portfolio page, navigate there first then scroll
+    if (this.router.url !== '/' && !this.router.url.startsWith('/#')) {
+      this.router.navigate(['/'], { fragment: sectionId }).then(() => {
+        setTimeout(() => this.scrollUtility.scrollToSection(sectionId), 100);
+      });
+    } else {
+      this.scrollUtility.scrollToSection(sectionId);
+    }
   }
 
   toggleMobileMenu(): void {

@@ -38,11 +38,14 @@ class ProfileServiceTest {
     @Mock
     private AvatarValidationService avatarValidationService;
 
+    @Mock
+    private ResumeValidationService resumeValidationService;
+
     private ProfileServiceImpl profileService;
 
     @BeforeEach
     void setUp() {
-        profileService = new ProfileServiceImpl(profileRepository, profileMapper, socialLinkMapper, avatarValidationService);
+        profileService = new ProfileServiceImpl(profileRepository, profileMapper, socialLinkMapper, avatarValidationService, resumeValidationService);
     }
 
     @Test

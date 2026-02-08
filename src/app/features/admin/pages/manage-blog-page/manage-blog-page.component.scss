@@ -1,0 +1,208 @@
+// ── Quill Editor ────────────────────────────────────────────
+.quill-editor-wrapper {
+  width: 100%;
+  display: block;
+
+  ::ng-deep {
+    .ql-toolbar {
+      border: 1px solid rgb(209 213 219); // gray-300
+      border-radius: 0.5rem 0.5rem 0 0;
+      background: white;
+      position: relative;
+      z-index: 2;
+
+      .dark & {
+        border-color: rgb(75 85 99); // gray-600
+        background: rgb(55 65 81); // gray-700
+
+        .ql-stroke {
+          stroke: rgb(209 213 219); // gray-300
+        }
+
+        .ql-fill {
+          fill: rgb(209 213 219);
+        }
+
+        .ql-picker-label {
+          color: rgb(209 213 219);
+
+          .ql-stroke {
+            stroke: rgb(209 213 219);
+          }
+        }
+
+        .ql-picker-item {
+          color: rgb(209 213 219);
+        }
+
+        button:hover,
+        .ql-picker-label:hover,
+        button.ql-active,
+        .ql-picker-label.ql-active {
+          .ql-stroke {
+            stroke: rgb(129 140 248); // indigo-400
+          }
+
+          .ql-fill {
+            fill: rgb(129 140 248);
+          }
+
+          color: rgb(129 140 248);
+        }
+      }
+    }
+
+    // Picker dropdown fix (header selector, etc.)
+    .ql-picker {
+      position: relative;
+    }
+
+    .ql-picker-options {
+      z-index: 10;
+      position: absolute !important;
+      background: white;
+      border: 1px solid rgb(209 213 219);
+      border-radius: 0.25rem;
+      box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+      padding: 4px 0;
+      min-width: 100px;
+
+      .ql-picker-item {
+        padding: 4px 8px;
+        cursor: pointer;
+
+        &:hover {
+          background: rgb(243 244 246); // gray-100
+        }
+      }
+
+      .dark & {
+        background: rgb(55 65 81);
+        border-color: rgb(75 85 99);
+        box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.3);
+
+        .ql-picker-item {
+          color: rgb(209 213 219);
+
+          &:hover {
+            background: rgb(75 85 99);
+          }
+        }
+      }
+    }
+
+    // Expanded state
+    .ql-expanded {
+      .ql-picker-options {
+        display: block;
+      }
+    }
+
+    .ql-container {
+      border: 1px solid rgb(209 213 219);
+      border-top: none;
+      border-radius: 0 0 0.5rem 0.5rem;
+      background: white;
+      font-size: 0.875rem;
+      width: 100%;
+
+      .dark & {
+        border-color: rgb(75 85 99);
+        background: rgb(55 65 81);
+        color: white;
+      }
+    }
+
+    .ql-editor {
+      min-height: 200px;
+      max-height: 500px;
+      overflow-y: auto;
+      line-height: 1.8;
+
+      &.ql-blank::before {
+        color: rgb(156 163 175); // gray-400
+        font-style: normal;
+
+        .dark & {
+          color: rgb(107 114 128); // gray-500
+        }
+      }
+
+      // Basic content styling inside editor
+      h1, h2, h3 {
+        margin-bottom: 0.5rem;
+        font-weight: 600;
+      }
+
+      p {
+        margin-bottom: 0.75rem;
+      }
+
+      blockquote {
+        border-left: 4px solid rgb(99 102 241);
+        padding-left: 1rem;
+        color: rgb(107 114 128);
+        margin: 1rem 0;
+      }
+
+      pre {
+        background: rgb(31 41 55);
+        color: rgb(229 231 235);
+        padding: 1rem;
+        border-radius: 0.5rem;
+        overflow-x: auto;
+        margin: 1rem 0;
+      }
+
+      ul, ol {
+        padding-left: 1.5rem;
+        margin-bottom: 0.75rem;
+      }
+    }
+  }
+}
+
+// ── Content Progress Bar ────────────────────────────────────
+.content-progress-track {
+  height: 4px;
+  border-radius: 2px;
+  background: rgb(229 231 235); // gray-200
+  overflow: hidden;
+
+  .dark & {
+    background: rgb(55 65 81); // gray-700
+  }
+}
+
+.content-progress-fill {
+  height: 100%;
+  border-radius: 2px;
+  background: rgb(99 102 241); // indigo-500
+  transition: width 0.3s ease, background-color 0.3s ease;
+
+  &.warn {
+    background: rgb(234 179 8); // yellow-500
+  }
+
+  &.danger {
+    background: rgb(239 68 68); // red-500
+  }
+}
+
+// ── Cover Image Preview ─────────────────────────────────────
+.cover-image-current {
+  position: relative;
+  max-width: 320px;
+}
+
+.cover-image-preview {
+  width: 100%;
+  max-height: 200px;
+  object-fit: cover;
+  border-radius: 0.5rem;
+  border: 1px solid rgb(229 231 235);
+
+  .dark & {
+    border-color: rgb(75 85 99);
+  }
+}
