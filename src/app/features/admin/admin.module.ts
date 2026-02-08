@@ -4,6 +4,7 @@ import { AdminRoutingModule } from './admin-routing.module';
 import { AgGridAngular } from 'ag-grid-angular';
 import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { BaseChartDirective } from 'ng2-charts';
+import { QuillModule } from 'ngx-quill';
 import { Chart, CategoryScale, LinearScale, BarController, BarElement, Legend, Title, Tooltip } from 'chart.js';
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
@@ -33,7 +34,8 @@ Chart.register(CategoryScale, LinearScale, BarController, BarElement, Legend, Ti
     SharedModule,
     AdminRoutingModule,
     AgGridAngular,
-    BaseChartDirective
+    BaseChartDirective,
+    QuillModule.forRoot()
   ],
   exports: [
     AdminSidebarComponent,

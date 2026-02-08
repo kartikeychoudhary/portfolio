@@ -55,6 +55,19 @@ public class Profile {
     @Column(name = "avatar_updated_at")
     private LocalDateTime avatarUpdatedAt;
 
+    @Lob
+    @Column(name = "resume_data", columnDefinition = "LONGBLOB")
+    private byte[] resumeData;
+
+    @Column(name = "resume_content_type", length = 50)
+    private String resumeContentType;
+
+    @Column(name = "resume_file_size")
+    private Integer resumeFileSize;
+
+    @Column(name = "resume_updated_at")
+    private LocalDateTime resumeUpdatedAt;
+
     @Column(name = "resume_url", length = 500)
     private String resumeUrl;
 

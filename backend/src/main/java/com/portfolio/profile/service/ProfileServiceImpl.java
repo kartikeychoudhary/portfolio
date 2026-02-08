@@ -24,16 +24,19 @@ public class ProfileServiceImpl implements ProfileService {
     private final ProfileMapper profileMapper;
     private final SocialLinkMapper socialLinkMapper;
     private final AvatarValidationService avatarValidationService;
+    private final ResumeValidationService resumeValidationService;
 
     @Autowired
     public ProfileServiceImpl(ProfileRepository profileRepository,
                              ProfileMapper profileMapper,
                              SocialLinkMapper socialLinkMapper,
-                             AvatarValidationService avatarValidationService) {
+                             AvatarValidationService avatarValidationService,
+                             ResumeValidationService resumeValidationService) {
         this.profileRepository = profileRepository;
         this.profileMapper = profileMapper;
         this.socialLinkMapper = socialLinkMapper;
         this.avatarValidationService = avatarValidationService;
+        this.resumeValidationService = resumeValidationService;
     }
 
     @Override
@@ -99,6 +102,35 @@ public class ProfileServiceImpl implements ProfileService {
         profile.setAvatarContentType(contentType);
         profile.setAvatarFileSize(avatarData.length);
         profile.setAvatarUpdatedAt(LocalDateTime.now());
+
+        // Save and return
+        Profile saved = profileRepository.save(profile);
+        return profileMapper.toDto(saved);
+    }
+
+    @Override
+    public ProfileDto updateResume(String profileId, String resumeBase64, String contentType) {
+        // Validate resume data
+        byte[] resumeData = resumeValidationService.validateAndDecode(resumeBase64, contentType);
+
+        // Get profile - use the first profile if profileId is "default" or not found
+        Profile profile;
+        if ("default".equals(profileId)) {
+            List<Profile> profiles = profileRepository.findAll();
+            if (profiles.isEmpty()) {
+                throw new ResourceNotFoundException("Profile", "id", profileId);
+            }
+            profile = profiles.get(0);
+        } else {
+            profile = profileRepository.findById(profileId)
+                .orElseThrow(() -> new ResourceNotFoundException("Profile", "id", profileId));
+        }
+
+        // Update resume
+        profile.setResumeData(resumeData);
+        profile.setResumeContentType(contentType);
+        profile.setResumeFileSize(resumeData.length);
+        profile.setResumeUpdatedAt(LocalDateTime.now());
 
         // Save and return
         Profile saved = profileRepository.save(profile);

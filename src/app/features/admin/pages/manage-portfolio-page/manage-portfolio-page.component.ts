@@ -7,6 +7,7 @@ import { ExperienceDto } from '../../../../core/models/experience.model';
 import { ProjectDto } from '../../../../core/models/project.model';
 import { AdminService } from '../../services/admin.service';
 import { PortfolioService } from '../../../portfolio/services/portfolio.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 export type PortfolioTab = 'profile' | 'skills' | 'experiences' | 'projects';
 
@@ -52,12 +53,14 @@ export class ManagePortfolioPageComponent implements OnInit {
   showProjectForm = false;
   projectForm!: FormGroup;
   projectSaving = false;
+  pendingThumbnail: { base64: string; contentType: string } | null = null;
 
   constructor(
     private fb: FormBuilder,
     private adminService: AdminService,
     private portfolioService: PortfolioService,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notification: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -81,10 +84,11 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.profileForm = this.fb.group({
       fullName: ['', Validators.required],
       title: ['', Validators.required],
+      email: ['', [Validators.required, Validators.email]],
+      phone: [''],
+      location: [''],
       tagline: [''],
       bio: [''],
-      avatarUrl: [''],
-      resumeUrl: [''],
     });
 
     this.skillForm = this.fb.group({
@@ -111,7 +115,6 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.projectForm = this.fb.group({
       title: ['', Validators.required],
       description: [''],
-      thumbnailUrl: [''],
       liveUrl: [''],
       repoUrl: [''],
       technologies: [''],
@@ -133,10 +136,11 @@ export class ManagePortfolioPageComponent implements OnInit {
         this.profileForm.patchValue({
           fullName: profile.fullName,
           title: profile.title,
+          email: profile.email,
+          phone: profile.phone,
+          location: profile.location,
           tagline: profile.tagline,
           bio: profile.bio,
-          avatarUrl: profile.avatarUrl,
-          resumeUrl: profile.resumeUrl,
         });
         this.profileLoading = false;
         this.cdr.markForCheck();
@@ -160,10 +164,12 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.adminService.updateProfile(this.profileForm.value).subscribe({
       next: () => {
         this.profileSaving = false;
+        this.notification.success('Profile saved');
         this.cdr.markForCheck();
       },
       error: () => {
         this.profileSaving = false;
+        this.notification.error('Failed to save profile');
         this.cdr.markForCheck();
       },
     });
@@ -187,15 +193,13 @@ export class ManagePortfolioPageComponent implements OnInit {
       next: (updated: ProfileDto) => {
         this.currentProfile = updated;
         this.profileSaving = false;
+        this.notification.success('Avatar uploaded');
         this.cdr.markForCheck();
-        // Show success message (you may want to add a toast service)
-        console.log('Avatar uploaded successfully');
       },
-      error: (error) => {
+      error: () => {
         this.profileSaving = false;
+        this.notification.error('Failed to upload avatar');
         this.cdr.markForCheck();
-        // Show error message (you may want to add a toast service)
-        console.error('Failed to upload avatar:', error);
       },
     });
   }
@@ -215,6 +219,95 @@ export class ManagePortfolioPageComponent implements OnInit {
 
     // Fallback to URL
     return this.currentProfile.avatarUrl;
+  }
+
+  /**
+   * Handle resume upload from file input
+   */
+  onResumeUploaded(event: { base64: string; contentType: string }): void {
+    if (!this.currentProfile?.id) {
+      console.error('No profile loaded');
+      return;
+    }
+
+    this.profileSaving = true;
+    this.cdr.markForCheck();
+
+    const profileId = this.currentProfile.id || 'default';
+
+    this.portfolioService.uploadResume(profileId, event.base64, event.contentType).subscribe({
+      next: (updated: ProfileDto) => {
+        this.currentProfile = updated;
+        this.profileSaving = false;
+        this.notification.success('Resume uploaded');
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.profileSaving = false;
+        this.notification.error('Failed to upload resume');
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  /**
+   * Handle resume file selection - reads file and triggers upload
+   */
+  onResumeFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    // Validate file type
+    if (file.type !== 'application/pdf') {
+      this.notification.error('Only PDF files are allowed');
+      input.value = '';
+      return;
+    }
+
+    // Validate file size (10MB)
+    const maxSize = 10 * 1024 * 1024;
+    if (file.size > maxSize) {
+      this.notification.error('File size exceeds 10MB limit');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      // Remove data URI prefix to get pure base64
+      const base64 = result.split(',')[1];
+      this.onResumeUploaded({ base64, contentType: file.type });
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  /**
+   * Get resume URL for display/download
+   */
+  getResumeUrl(): string | undefined {
+    if (!this.currentProfile) return undefined;
+
+    // Check if resume BLOB exists
+    if (this.currentProfile.resumeBase64) {
+      return '/api/profile/resume';
+    }
+
+    // Fallback to URL
+    return this.currentProfile.resumeUrl || undefined;
+  }
+
+  /**
+   * Format file size for display
+   */
+  formatFileSize(bytes: number | undefined): string {
+    if (!bytes) return '';
+    if (bytes < 1024) return bytes + ' B';
+    if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + ' KB';
+    return (bytes / (1024 * 1024)).toFixed(1) + ' MB';
   }
 
   // ── Skills ────────────────────────────────────────────────
@@ -284,10 +377,12 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.skillSaving = false;
           this.showSkillForm = false;
           this.editingSkill = null;
+          this.notification.success('Skill updated');
           this.cdr.markForCheck();
         },
         error: () => {
           this.skillSaving = false;
+          this.notification.error('Failed to save skill');
           this.cdr.markForCheck();
         },
       });
@@ -297,10 +392,12 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.skills = [...this.skills, created];
           this.skillSaving = false;
           this.showSkillForm = false;
+          this.notification.success('Skill created');
           this.cdr.markForCheck();
         },
         error: () => {
           this.skillSaving = false;
+          this.notification.error('Failed to save skill');
           this.cdr.markForCheck();
         },
       });
@@ -311,7 +408,11 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.adminService.deleteSkill(skill.id).subscribe({
       next: () => {
         this.skills = this.skills.filter(s => s.id !== skill.id);
+        this.notification.success('Skill deleted');
         this.cdr.markForCheck();
+      },
+      error: () => {
+        this.notification.error('Failed to delete skill');
       },
     });
   }
@@ -399,10 +500,12 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.experienceSaving = false;
           this.showExperienceForm = false;
           this.editingExperience = null;
+          this.notification.success('Experience updated');
           this.cdr.markForCheck();
         },
         error: () => {
           this.experienceSaving = false;
+          this.notification.error('Failed to save experience');
           this.cdr.markForCheck();
         },
       });
@@ -412,10 +515,12 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.experiences = [...this.experiences, created];
           this.experienceSaving = false;
           this.showExperienceForm = false;
+          this.notification.success('Experience created');
           this.cdr.markForCheck();
         },
         error: () => {
           this.experienceSaving = false;
+          this.notification.error('Failed to save experience');
           this.cdr.markForCheck();
         },
       });
@@ -426,7 +531,11 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.adminService.deleteExperience(exp.id).subscribe({
       next: () => {
         this.experiences = this.experiences.filter(e => e.id !== exp.id);
+        this.notification.success('Experience deleted');
         this.cdr.markForCheck();
+      },
+      error: () => {
+        this.notification.error('Failed to delete experience');
       },
     });
   }
@@ -452,8 +561,9 @@ export class ManagePortfolioPageComponent implements OnInit {
 
   openAddProject(): void {
     this.editingProject = null;
+    this.pendingThumbnail = null;
     this.projectForm.reset({
-      title: '', description: '', thumbnailUrl: '',
+      title: '', description: '',
       liveUrl: '', repoUrl: '', technologies: '',
       featured: false, sortOrder: 0,
     });
@@ -463,10 +573,10 @@ export class ManagePortfolioPageComponent implements OnInit {
 
   openEditProject(project: ProjectDto): void {
     this.editingProject = project;
+    this.pendingThumbnail = null;
     this.projectForm.patchValue({
       title: project.title,
       description: project.description,
-      thumbnailUrl: project.thumbnailUrl,
       liveUrl: project.liveUrl || '',
       repoUrl: project.repoUrl || '',
       technologies: project.technologies.join(', '),
@@ -480,6 +590,7 @@ export class ManagePortfolioPageComponent implements OnInit {
   cancelProjectForm(): void {
     this.showProjectForm = false;
     this.editingProject = null;
+    this.pendingThumbnail = null;
     this.cdr.markForCheck();
   }
 
@@ -500,45 +611,123 @@ export class ManagePortfolioPageComponent implements OnInit {
         : formValue.technologies,
     };
 
-    if (this.editingProject) {
-      this.adminService.updateProject(this.editingProject.id, payload).subscribe({
-        next: (updated: ProjectDto) => {
-          const idx = this.projects.findIndex(p => p.id === updated.id);
-          if (idx !== -1) {
-            this.projects[idx] = updated;
-            this.projects = [...this.projects];
-          }
-          this.projectSaving = false;
-          this.showProjectForm = false;
-          this.editingProject = null;
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.projectSaving = false;
-          this.cdr.markForCheck();
-        },
-      });
-    } else {
-      this.adminService.createProject(payload).subscribe({
-        next: (created: ProjectDto) => {
-          this.projects = [...this.projects, created];
-          this.projectSaving = false;
-          this.showProjectForm = false;
-          this.cdr.markForCheck();
-        },
-        error: () => {
-          this.projectSaving = false;
-          this.cdr.markForCheck();
-        },
-      });
+    const saveOperation = this.editingProject
+      ? this.adminService.updateProject(this.editingProject.id, payload)
+      : this.adminService.createProject(payload);
+
+    saveOperation.subscribe({
+      next: (savedProject: ProjectDto) => {
+        // Upload thumbnail if pending
+        if (this.pendingThumbnail) {
+          this.adminService.uploadProjectThumbnail(
+            savedProject.id,
+            this.pendingThumbnail.base64,
+            this.pendingThumbnail.contentType
+          ).subscribe({
+            next: () => {
+              this.pendingThumbnail = null;
+              this.finishProjectSave();
+            },
+            error: () => {
+              this.notification.error('Project saved but thumbnail upload failed');
+              this.pendingThumbnail = null;
+              this.finishProjectSave();
+            },
+          });
+        } else {
+          this.finishProjectSave();
+        }
+      },
+      error: () => {
+        this.projectSaving = false;
+        this.notification.error('Failed to save project');
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  private finishProjectSave(): void {
+    this.projectSaving = false;
+    this.showProjectForm = false;
+    this.editingProject = null;
+    this.notification.success('Project saved');
+    this.loadProjects();
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Handle thumbnail file selection
+   */
+  onThumbnailFileSelected(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const file = input.files[0];
+
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
+    if (!allowedTypes.includes(file.type)) {
+      this.notification.error('Only JPEG, PNG, and WebP images are allowed');
+      input.value = '';
+      return;
     }
+
+    // Validate file size (2MB)
+    const maxSize = 2 * 1024 * 1024;
+    if (file.size > maxSize) {
+      this.notification.error('Image size exceeds 2MB limit');
+      input.value = '';
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      const result = reader.result as string;
+      const base64 = result.split(',')[1];
+      this.pendingThumbnail = { base64, contentType: file.type };
+      this.cdr.markForCheck();
+    };
+    reader.readAsDataURL(file);
+    input.value = '';
+  }
+
+  /**
+   * Get thumbnail URL for display (supports both URL and Base64)
+   */
+  getThumbnailUrl(project: ProjectDto | null): string | undefined {
+    if (!project) return undefined;
+
+    // Use Base64 data if available
+    if (project.thumbnailBase64 && project.thumbnailContentType) {
+      return `data:${project.thumbnailContentType};base64,${project.thumbnailBase64}`;
+    }
+
+    // Fallback to URL
+    return project.thumbnailUrl || undefined;
+  }
+
+  /**
+   * Get pending thumbnail preview for the form
+   */
+  getPendingThumbnailPreview(): string | undefined {
+    if (this.pendingThumbnail) {
+      return `data:${this.pendingThumbnail.contentType};base64,${this.pendingThumbnail.base64}`;
+    }
+    if (this.editingProject) {
+      return this.getThumbnailUrl(this.editingProject);
+    }
+    return undefined;
   }
 
   deleteProject(project: ProjectDto): void {
     this.adminService.deleteProject(project.id).subscribe({
       next: () => {
         this.projects = this.projects.filter(p => p.id !== project.id);
+        this.notification.success('Project deleted');
         this.cdr.markForCheck();
+      },
+      error: () => {
+        this.notification.error('Failed to delete project');
       },
     });
   }

@@ -78,6 +78,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/projects").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/blogs").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/blogs/{slug}").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/blogs/*/cover-image").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/profile/avatar").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/profile/resume").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/projects/*/thumbnail").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/contacts").permitAll()
                 // Admin endpoints
                 .anyRequest().authenticated()

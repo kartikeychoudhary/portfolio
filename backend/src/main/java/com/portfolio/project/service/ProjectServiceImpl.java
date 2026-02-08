@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Service
@@ -17,11 +18,15 @@ public class ProjectServiceImpl implements ProjectService {
 
     private final ProjectRepository projectRepository;
     private final ProjectMapper projectMapper;
+    private final ProjectImageValidationService imageValidationService;
 
     @Autowired
-    public ProjectServiceImpl(ProjectRepository projectRepository, ProjectMapper projectMapper) {
+    public ProjectServiceImpl(ProjectRepository projectRepository,
+                             ProjectMapper projectMapper,
+                             ProjectImageValidationService imageValidationService) {
         this.projectRepository = projectRepository;
         this.projectMapper = projectMapper;
+        this.imageValidationService = imageValidationService;
     }
 
     @Override
@@ -68,5 +73,25 @@ public class ProjectServiceImpl implements ProjectService {
     public List<ProjectDto> getFeaturedProjects() {
         List<Project> projects = projectRepository.findFeaturedProjects();
         return projectMapper.toDtoList(projects);
+    }
+
+    @Override
+    public ProjectDto updateThumbnail(String projectId, String thumbnailBase64, String contentType) {
+        // Validate thumbnail data
+        byte[] thumbnailData = imageValidationService.validateAndDecode(thumbnailBase64, contentType);
+
+        // Get project
+        Project project = projectRepository.findById(projectId)
+                .orElseThrow(() -> new ResourceNotFoundException("Project", "id", projectId));
+
+        // Update thumbnail
+        project.setThumbnailData(thumbnailData);
+        project.setThumbnailContentType(contentType);
+        project.setThumbnailFileSize(thumbnailData.length);
+        project.setThumbnailUpdatedAt(LocalDateTime.now());
+
+        // Save and return
+        Project saved = projectRepository.save(project);
+        return projectMapper.toDto(saved);
     }
 }

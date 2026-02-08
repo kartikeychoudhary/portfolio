@@ -51,6 +51,16 @@ public class Blog {
     @Column(name = "cover_image", length = 500)
     private String coverImage;
 
+    @Lob
+    @Column(name = "cover_image_data", columnDefinition = "MEDIUMBLOB")
+    private byte[] coverImageData;
+
+    @Column(name = "cover_image_content_type", length = 50)
+    private String coverImageContentType;
+
+    @Column(name = "cover_image_file_size")
+    private Integer coverImageFileSize;
+
     @Column(columnDefinition = "JSON")
     private String tags;
 

@@ -2,12 +2,16 @@ package com.portfolio.profile.controller;
 
 import com.portfolio.profile.dto.AvatarUploadRequest;
 import com.portfolio.profile.dto.ProfileDto;
+import com.portfolio.profile.dto.ResumeUploadRequest;
 import com.portfolio.profile.service.ProfileService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
+
+import java.time.Duration;
+import java.util.Base64;
 
 @RestController
 @RequestMapping("/api/profile")
@@ -49,5 +53,52 @@ public class ProfileController {
             request.getContentType()
         );
         return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Upload resume PDF
+     * ADMIN only
+     * @param profileId Profile ID (use "default" for the main profile)
+     * @param request Resume upload request with Base64 data and content type
+     * @return Updated profile with new resume
+     */
+    @PostMapping("/{profileId}/resume")
+    @PreAuthorize("hasRole('admin')")
+    public ResponseEntity<ProfileDto> uploadResume(
+        @PathVariable String profileId,
+        @Valid @RequestBody ResumeUploadRequest request
+    ) {
+        ProfileDto updated = profileService.updateResume(
+            profileId,
+            request.getResumeBase64(),
+            request.getContentType()
+        );
+        return ResponseEntity.ok(updated);
+    }
+
+    /**
+     * Get resume PDF (public endpoint)
+     * Returns the resume PDF for inline viewing or download
+     */
+    @GetMapping("/resume")
+    public ResponseEntity<byte[]> getResume() {
+        ProfileDto profile = profileService.getProfile();
+
+        if (profile.getResumeBase64() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        byte[] resumeData = Base64.getDecoder().decode(profile.getResumeBase64());
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_PDF);
+        headers.setContentDisposition(
+            ContentDisposition.inline()
+                .filename("resume.pdf")
+                .build()
+        );
+        headers.setCacheControl(CacheControl.maxAge(Duration.ofDays(7)).cachePublic());
+
+        return new ResponseEntity<>(resumeData, headers, HttpStatus.OK);
     }
 }

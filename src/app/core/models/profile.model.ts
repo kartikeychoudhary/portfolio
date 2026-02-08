@@ -29,6 +29,12 @@ export interface ProfileDto {
   /** Avatar file size in bytes */
   avatarFileSize?: number;
   resumeUrl: string;
+  /** Base64-encoded resume PDF data (without data URI prefix) */
+  resumeBase64?: string;
+  /** MIME type for resume (application/pdf) */
+  resumeContentType?: string;
+  /** Resume file size in bytes */
+  resumeFileSize?: number;
   socialLinks: SocialLink[];
   createdAt?: string;
   updatedAt?: string;

@@ -88,4 +88,18 @@ export class PortfolioService {
       contentType
     });
   }
+
+  /**
+   * Uploads resume PDF for a profile.
+   * @param profileId - Profile ID (use "default" for main profile)
+   * @param resumeBase64 - Base64-encoded PDF data (without data URI prefix)
+   * @param contentType - MIME type (application/pdf)
+   * @returns Observable of updated ProfileDto
+   */
+  uploadResume(profileId: string, resumeBase64: string, contentType: string): Observable<ProfileDto> {
+    return this.api.post<ProfileDto>(`/profile/${profileId}/resume`, {
+      resumeBase64,
+      contentType
+    });
+  }
 }

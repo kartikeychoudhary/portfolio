@@ -30,6 +30,8 @@ public class BlogDto {
     private String content;
 
     private String coverImage;
+    private String coverImageContentType;
+    private Integer coverImageFileSize;
 
     @Builder.Default
     private List<String> tags = new ArrayList<>();

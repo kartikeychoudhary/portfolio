@@ -2,6 +2,7 @@ import { NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { providePrimeNG } from 'primeng/config';
+import { ToastModule } from 'primeng/toast';
 import Aura from '@primeuix/themes/aura';
 
 import { AppRoutingModule } from './app-routing.module';
@@ -18,7 +19,8 @@ import { LayoutModule } from './layout/layout.module';
     BrowserAnimationsModule,
     AppRoutingModule,
     CoreModule,
-    LayoutModule
+    LayoutModule,
+    ToastModule
   ],
   providers: [
     providePrimeNG({

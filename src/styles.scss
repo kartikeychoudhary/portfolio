@@ -5,8 +5,8 @@
 // Import theme first (design tokens and mixins)
 @import 'styles/theme';
 
-/* Google Font - Inter */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+/* Google Font - Space Grotesk */
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap');
 
 /* Tailwind */
 @tailwind base;
@@ -18,6 +18,9 @@
 
 /* Font Awesome */
 @import "@fortawesome/fontawesome-free/css/all.min.css";
+
+/* Quill Editor Snow Theme */
+@import "quill/dist/quill.snow.css";
 
 /* AG Grid Community */
 @import "ag-grid-community/styles/ag-grid.css";
@@ -56,7 +59,7 @@ body {
 
 h1, h2, h3, h4, h5, h6 {
   @include font-heading;
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
 }
 
 h1 {
@@ -88,7 +91,7 @@ h5 { font-size: var(--font-size-xl); }
 h6 { font-size: var(--font-size-lg); }
 
 p {
-  margin-bottom: var(--spacing-md);
+  margin-bottom: var(--spacing-sm);
   line-height: var(--line-height-relaxed);
 }
 

@@ -2,6 +2,7 @@ import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@
 import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
+import { NotificationService } from '../../../../core/services/notification.service';
 
 @Component({
   selector: 'app-settings-page',
@@ -23,7 +24,8 @@ export class SettingsPage implements OnInit {
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private cdr: ChangeDetectorRef
+    private cdr: ChangeDetectorRef,
+    private notification: NotificationService
   ) {
     this.changePasswordForm = this.fb.group({
       currentPassword: ['', Validators.required],
@@ -77,6 +79,7 @@ export class SettingsPage implements OnInit {
       next: (response) => {
         this.isSubmitting = false;
         this.successMessage = response.message;
+        this.notification.success('Password changed successfully');
         this.changePasswordForm.reset();
         this.cdr.markForCheck();
 
@@ -87,6 +90,7 @@ export class SettingsPage implements OnInit {
       error: (err) => {
         this.isSubmitting = false;
         this.errorMessage = err.error || 'Failed to change password. Please try again.';
+        this.notification.error('Failed to change password');
         this.cdr.markForCheck();
       },
     });
