@@ -1,7 +1,18 @@
-<app-scroll-progress-bar></app-scroll-progress-bar>
-<app-hero-section></app-hero-section>
-<app-about-section></app-about-section>
-<app-skills-section></app-skills-section>
-<app-experience-section></app-experience-section>
-<app-projects-section></app-projects-section>
-<app-contact-section></app-contact-section>
+<!-- Full-page loading overlay -->
+<div *ngIf="isLoading" class="loading-overlay">
+  <div class="loading-content">
+    <i class="pi pi-spin pi-spinner loading-spinner"></i>
+    <p class="loading-text">Loading portfolio...</p>
+  </div>
+</div>
+
+<!-- Portfolio sections (rendered immediately, data comes from cache) -->
+<div [class.opacity-0]="isLoading" class="portfolio-fade">
+  <app-scroll-progress-bar></app-scroll-progress-bar>
+  <app-hero-section *ngIf="settings.heroVisible"></app-hero-section>
+  <app-about-section *ngIf="settings.aboutVisible"></app-about-section>
+  <app-skills-section *ngIf="settings.skillsVisible"></app-skills-section>
+  <app-experience-section *ngIf="settings.experienceVisible"></app-experience-section>
+  <app-projects-section *ngIf="settings.projectsVisible"></app-projects-section>
+  <app-contact-section *ngIf="settings.contactVisible"></app-contact-section>
+</div>

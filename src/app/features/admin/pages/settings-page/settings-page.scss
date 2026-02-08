@@ -1,8 +1,3 @@
-.settings-page {
-  min-height: 100vh;
-  background-color: #f9fafb;
-
-  @media (prefers-color-scheme: dark) {
-    background-color: #111827;
-  }
-}
+// Settings page uses the same admin layout pattern as other admin pages
+// (sidebar + main content), so no special page-level styles needed.
+// Card layout is handled by Tailwind utility classes in the template.

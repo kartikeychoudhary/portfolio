@@ -190,6 +190,56 @@
             ></textarea>
           </div>
 
+          <!-- Social Links -->
+          <div class="flex flex-col gap-3">
+            <div class="flex items-center justify-between">
+              <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Social Links</label>
+              <button
+                type="button"
+                (click)="addSocialLink()"
+                class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-medium rounded-md transition-colors"
+              >
+                <i class="fa-solid fa-plus"></i> Add Link
+              </button>
+            </div>
+
+            <div *ngIf="socialLinksForm.length === 0" class="text-center py-4 text-gray-400 dark:text-gray-500 text-sm border border-dashed border-gray-300 dark:border-gray-600 rounded-md">
+              No social links yet. Click "Add Link" to add one.
+            </div>
+
+            <div *ngFor="let link of socialLinksForm.controls; let i = index" class="flex items-center gap-3 p-3 border border-gray-200 dark:border-gray-600 rounded-md bg-gray-50 dark:bg-gray-700">
+              <!-- Icon preview -->
+              <i [class]="link.get('icon')?.value" class="text-xl text-indigo-600 dark:text-indigo-400 w-6 text-center flex-shrink-0"></i>
+
+              <!-- Platform dropdown -->
+              <select
+                [formControl]="$any(link.get('platform'))"
+                (change)="onPlatformChange(i)"
+                class="rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-2 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 w-36 flex-shrink-0"
+              >
+                <option *ngFor="let opt of platformOptions" [value]="opt.value">{{ opt.label }}</option>
+              </select>
+
+              <!-- URL input -->
+              <input
+                type="url"
+                [formControl]="$any(link.get('url'))"
+                placeholder="https://..."
+                class="flex-1 rounded-md border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-800 dark:text-gray-100 px-3 py-1.5 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+              />
+
+              <!-- Remove button -->
+              <button
+                type="button"
+                (click)="removeSocialLink(i)"
+                class="text-red-500 hover:text-red-700 dark:hover:text-red-400 flex-shrink-0"
+                pTooltip="Remove"
+              >
+                <i class="fa-solid fa-trash-can"></i>
+              </button>
+            </div>
+          </div>
+
           <!-- Avatar Upload -->
           <div class="flex flex-col gap-1">
             <label class="text-sm font-medium text-gray-700 dark:text-gray-300">Avatar Image</label>
@@ -425,15 +475,15 @@
               <label for="expLogo" class="text-sm font-medium text-gray-700 dark:text-gray-300">Company Logo URL</label>
               <input id="expLogo" type="text" pInputText formControlName="companyLogo" placeholder="https://..." class="w-full" />
             </div>
-            <!-- Role -->
+            <!-- Position -->
             <div class="flex flex-col gap-1">
-              <label for="expRole" class="text-sm font-medium text-gray-700 dark:text-gray-300">Role</label>
-              <input id="expRole" type="text" pInputText formControlName="role" placeholder="e.g. Senior Developer" class="w-full" />
+              <label for="expPosition" class="text-sm font-medium text-gray-700 dark:text-gray-300">Position</label>
+              <input id="expPosition" type="text" pInputText formControlName="position" placeholder="e.g. Senior Developer" class="w-full" />
               <small
-                *ngIf="experienceForm.get('role')?.touched && experienceForm.get('role')?.hasError('required')"
+                *ngIf="experienceForm.get('position')?.touched && experienceForm.get('position')?.hasError('required')"
                 class="text-red-500 dark:text-red-400 text-xs"
               >
-                Role is required.
+                Position is required.
               </small>
             </div>
             <!-- Location -->
@@ -529,7 +579,7 @@
                 <i class="fa-solid fa-building text-indigo-600 dark:text-indigo-400"></i>
               </div>
               <div class="min-w-0">
-                <h4 class="text-sm font-semibold text-gray-800 dark:text-white">{{ exp.role }}</h4>
+                <h4 class="text-sm font-semibold text-gray-800 dark:text-white">{{ exp.position }}</h4>
                 <p class="text-sm text-gray-600 dark:text-gray-300">{{ exp.company }}</p>
                 <p class="text-xs text-gray-500 dark:text-gray-400 mt-1">
                   {{ exp.startDate }} - {{ exp.isCurrent ? 'Present' : exp.endDate }}

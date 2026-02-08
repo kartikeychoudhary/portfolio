@@ -83,6 +83,7 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/profile/resume").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/projects/*/thumbnail").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/contacts").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/settings").permitAll()
                 // Admin endpoints
                 .anyRequest().authenticated()
             );

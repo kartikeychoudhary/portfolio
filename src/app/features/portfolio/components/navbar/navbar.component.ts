@@ -1,7 +1,10 @@
-import { Component, ChangeDetectionStrategy, HostListener, ChangeDetectorRef, signal } from '@angular/core';
+import { Component, ChangeDetectionStrategy, HostListener, ChangeDetectorRef, signal, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
+import { Subscription } from 'rxjs';
 import { ThemeService } from '../../../../core/services/theme.service';
 import { ScrollUtilityService } from '../../../../core/services/scroll-utility.service';
+import { SettingsService } from '../../../../core/services/settings.service';
+import { SiteSettingsDto } from '../../../../core/models/settings.model';
 
 @Component({
   selector: 'app-navbar',
@@ -10,26 +13,44 @@ import { ScrollUtilityService } from '../../../../core/services/scroll-utility.s
   styleUrls: ['./navbar.component.scss'],
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavbarComponent {
+export class NavbarComponent implements OnInit, OnDestroy {
   isScrolled = signal(false);
   isMobileMenuOpen = signal(false);
   activeSection = signal('home');
 
-  sections = [
-    { id: 'home', label: 'Home' },
-    { id: 'about', label: 'About' },
-    { id: 'skills', label: 'Skills' },
-    { id: 'experience', label: 'Experience' },
-    { id: 'projects', label: 'Projects' },
-    { id: 'contact', label: 'Contact' }
+  private allSections = [
+    { id: 'home', label: 'Home', visibilityKey: 'heroVisible' },
+    { id: 'about', label: 'About', visibilityKey: 'aboutVisible' },
+    { id: 'skills', label: 'Skills', visibilityKey: 'skillsVisible' },
+    { id: 'experience', label: 'Experience', visibilityKey: 'experienceVisible' },
+    { id: 'projects', label: 'Projects', visibilityKey: 'projectsVisible' },
+    { id: 'contact', label: 'Contact', visibilityKey: 'contactVisible' }
   ];
+
+  sections: { id: string; label: string }[] = this.allSections;
+
+  private settingsSub?: Subscription;
 
   constructor(
     public themeService: ThemeService,
     private cdr: ChangeDetectorRef,
     private scrollUtility: ScrollUtilityService,
-    private router: Router
+    private router: Router,
+    private settingsService: SettingsService
   ) {}
+
+  ngOnInit(): void {
+    this.settingsSub = this.settingsService.settings$.subscribe(settings => {
+      this.sections = this.allSections.filter(
+        s => (settings as unknown as Record<string, unknown>)[s.visibilityKey] !== false
+      );
+      this.cdr.markForCheck();
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.settingsSub?.unsubscribe();
+  }
 
   @HostListener('window:scroll')
   onScroll(): void {

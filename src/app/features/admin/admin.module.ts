@@ -6,6 +6,9 @@ import { ModuleRegistry, AllCommunityModule } from 'ag-grid-community';
 import { BaseChartDirective } from 'ng2-charts';
 import { QuillModule } from 'ngx-quill';
 import { Chart, CategoryScale, LinearScale, BarController, BarElement, Legend, Title, Tooltip } from 'chart.js';
+import { SelectButtonModule } from 'primeng/selectbutton';
+import { ColorPickerModule } from 'primeng/colorpicker';
+import { ToggleSwitchModule } from 'primeng/toggleswitch';
 import { LoginPageComponent } from './pages/login-page/login-page.component';
 import { DashboardPageComponent } from './pages/dashboard-page/dashboard-page.component';
 import { ManagePortfolioPageComponent } from './pages/manage-portfolio-page/manage-portfolio-page.component';
@@ -35,7 +38,10 @@ Chart.register(CategoryScale, LinearScale, BarController, BarElement, Legend, Ti
     AdminRoutingModule,
     AgGridAngular,
     BaseChartDirective,
-    QuillModule.forRoot()
+    QuillModule.forRoot(),
+    SelectButtonModule,
+    ColorPickerModule,
+    ToggleSwitchModule,
   ],
   exports: [
     AdminSidebarComponent,
