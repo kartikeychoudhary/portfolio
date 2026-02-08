@@ -3,6 +3,13 @@ import { FormBuilder, FormGroup, Validators, AbstractControl, ValidationErrors }
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../core/services/auth.service';
 import { NotificationService } from '../../../../core/services/notification.service';
+import { SettingsService } from '../../../../core/services/settings.service';
+import {
+  SiteSettingsDto,
+  AvatarSize,
+  FONT_OPTIONS,
+  ACCENT_PRESETS,
+} from '../../../../core/models/settings.model';
 
 @Component({
   selector: 'app-settings-page',
@@ -12,6 +19,7 @@ import { NotificationService } from '../../../../core/services/notification.serv
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class SettingsPage implements OnInit {
+  // ── Change Password ─────────────────────────────────────
   changePasswordForm: FormGroup;
   isSubmitting = false;
   errorMessage = '';
@@ -19,13 +27,31 @@ export class SettingsPage implements OnInit {
   showCurrentPassword = false;
   showNewPassword = false;
   showConfirmPassword = false;
+  requiresPasswordChange = false;
+
+  // ── Site Settings ───────────────────────────────────────
+  settingsForm!: FormGroup;
+  settingsLoading = true;
+  settingsSaving = false;
+
+  avatarSizeOptions = [
+    { label: 'Small', value: 'small' },
+    { label: 'Medium', value: 'medium' },
+    { label: 'Large', value: 'large' },
+    { label: 'Extra Large', value: 'xlarge' },
+  ];
+
+  fontOptions = FONT_OPTIONS;
+  accentPresets = ACCENT_PRESETS;
+  customAccentColor = '#3b82f6';
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
     private cdr: ChangeDetectorRef,
-    private notification: NotificationService
+    private notification: NotificationService,
+    private settingsService: SettingsService
   ) {
     this.changePasswordForm = this.fb.group({
       currentPassword: ['', Validators.required],
@@ -36,14 +62,109 @@ export class SettingsPage implements OnInit {
       ]],
       confirmPassword: ['', Validators.required],
     }, { validators: this.passwordMatchValidator });
+
+    this.settingsForm = this.fb.group({
+      avatarSize: ['medium'],
+      accentColor: ['#3b82f6'],
+      fontFamily: ['Space Grotesk'],
+      heroVisible: [true],
+      aboutVisible: [true],
+      skillsVisible: [true],
+      experienceVisible: [true],
+      projectsVisible: [true],
+      contactVisible: [true],
+    });
   }
 
   ngOnInit(): void {
-    if (this.authService.requiresPasswordChange()) {
+    this.requiresPasswordChange = this.authService.requiresPasswordChange();
+    if (this.requiresPasswordChange) {
       this.successMessage = 'Please change your password before continuing.';
-      this.cdr.markForCheck();
     }
+
+    this.loadSettings();
   }
+
+  // ── Settings ────────────────────────────────────────────
+
+  private loadSettings(): void {
+    this.settingsLoading = true;
+    this.cdr.markForCheck();
+
+    this.settingsService.getSettings().subscribe({
+      next: (settings: SiteSettingsDto) => {
+        this.settingsForm.patchValue({
+          avatarSize: settings.avatarSize,
+          accentColor: settings.accentColor,
+          fontFamily: settings.fontFamily,
+          heroVisible: settings.heroVisible,
+          aboutVisible: settings.aboutVisible,
+          skillsVisible: settings.skillsVisible,
+          experienceVisible: settings.experienceVisible,
+          projectsVisible: settings.projectsVisible,
+          contactVisible: settings.contactVisible,
+        });
+        this.customAccentColor = settings.accentColor;
+        this.settingsLoading = false;
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.settingsLoading = false;
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  selectAccentPreset(hex: string): void {
+    this.settingsForm.patchValue({ accentColor: hex });
+    this.customAccentColor = hex;
+    this.cdr.markForCheck();
+  }
+
+  onCustomColorChange(color: string): void {
+    // PrimeNG ColorPicker emits various formats; normalize to hex
+    const hex = color.startsWith('#') ? color : `#${color}`;
+    this.settingsForm.patchValue({ accentColor: hex });
+    this.customAccentColor = hex;
+    this.cdr.markForCheck();
+  }
+
+  isActivePreset(hex: string): boolean {
+    return this.settingsForm.get('accentColor')?.value === hex;
+  }
+
+  saveSettings(): void {
+    this.settingsSaving = true;
+    this.cdr.markForCheck();
+
+    const formValue = this.settingsForm.value;
+    const payload: SiteSettingsDto = {
+      avatarSize: formValue.avatarSize as AvatarSize,
+      accentColor: formValue.accentColor,
+      fontFamily: formValue.fontFamily,
+      heroVisible: formValue.heroVisible,
+      aboutVisible: formValue.aboutVisible,
+      skillsVisible: formValue.skillsVisible,
+      experienceVisible: formValue.experienceVisible,
+      projectsVisible: formValue.projectsVisible,
+      contactVisible: formValue.contactVisible,
+    };
+
+    this.settingsService.updateSettings(payload).subscribe({
+      next: () => {
+        this.settingsSaving = false;
+        this.notification.success('Settings saved');
+        this.cdr.markForCheck();
+      },
+      error: () => {
+        this.settingsSaving = false;
+        this.notification.error('Failed to save settings');
+        this.cdr.markForCheck();
+      },
+    });
+  }
+
+  // ── Password ────────────────────────────────────────────
 
   private passwordStrengthValidator(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
@@ -81,6 +202,7 @@ export class SettingsPage implements OnInit {
         this.successMessage = response.message;
         this.notification.success('Password changed successfully');
         this.changePasswordForm.reset();
+        this.requiresPasswordChange = false;
         this.cdr.markForCheck();
 
         setTimeout(() => {

@@ -3,7 +3,7 @@ export interface ExperienceDto {
   id: string;
   company: string;
   companyLogo?: string;
-  role: string;
+  position: string;
   location: string;
   /** ISO date string, e.g. '2022-01-15' */
   startDate: string;

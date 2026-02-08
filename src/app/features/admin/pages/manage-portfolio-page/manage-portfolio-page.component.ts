@@ -1,7 +1,7 @@
 import { Component, ChangeDetectionStrategy, ChangeDetectorRef, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, FormArray, Validators } from '@angular/forms';
 
-import { ProfileDto } from '../../../../core/models/profile.model';
+import { ProfileDto, SocialLink } from '../../../../core/models/profile.model';
 import { SkillDto, SkillCategory } from '../../../../core/models/skill.model';
 import { ExperienceDto } from '../../../../core/models/experience.model';
 import { ProjectDto } from '../../../../core/models/project.model';
@@ -25,6 +25,27 @@ export class ManagePortfolioPageComponent implements OnInit {
   profileForm!: FormGroup;
   profileLoading = false;
   profileSaving = false;
+
+  // ── Social Links ────────────────────────────────────────
+  socialLinksForm!: FormArray;
+
+  platformOptions = [
+    { label: 'LinkedIn', value: 'linkedin' },
+    { label: 'GitHub', value: 'github' },
+    { label: 'Instagram', value: 'instagram' },
+    { label: 'Twitter / X', value: 'twitter' },
+    { label: 'Website', value: 'website' },
+    { label: 'YouTube', value: 'youtube' },
+  ];
+
+  platformIcons: Record<string, string> = {
+    linkedin: 'fa-brands fa-linkedin',
+    github: 'fa-brands fa-github',
+    instagram: 'fa-brands fa-instagram',
+    twitter: 'fa-brands fa-x-twitter',
+    website: 'fa-solid fa-globe',
+    youtube: 'fa-brands fa-youtube',
+  };
 
   // ── Skills ────────────────────────────────────────────────
   skills: SkillDto[] = [];
@@ -91,6 +112,8 @@ export class ManagePortfolioPageComponent implements OnInit {
       bio: [''],
     });
 
+    this.socialLinksForm = this.fb.array([]);
+
     this.skillForm = this.fb.group({
       name: ['', Validators.required],
       icon: [''],
@@ -102,7 +125,7 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.experienceForm = this.fb.group({
       company: ['', Validators.required],
       companyLogo: [''],
-      role: ['', Validators.required],
+      position: ['', Validators.required],
       location: [''],
       startDate: ['', Validators.required],
       endDate: [''],
@@ -142,6 +165,15 @@ export class ManagePortfolioPageComponent implements OnInit {
           tagline: profile.tagline,
           bio: profile.bio,
         });
+
+        // Populate social links
+        this.socialLinksForm.clear();
+        if (profile.socialLinks?.length) {
+          profile.socialLinks.forEach(link => {
+            this.socialLinksForm.push(this.createSocialLinkGroup(link));
+          });
+        }
+
         this.profileLoading = false;
         this.cdr.markForCheck();
       },
@@ -161,9 +193,15 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.profileSaving = true;
     this.cdr.markForCheck();
 
-    this.adminService.updateProfile(this.profileForm.value).subscribe({
+    const payload = {
+      ...this.profileForm.value,
+      socialLinks: this.socialLinksForm.value,
+    };
+
+    this.adminService.updateProfile(payload).subscribe({
       next: () => {
         this.profileSaving = false;
+        this.portfolioService.invalidateCache();
         this.notification.success('Profile saved');
         this.cdr.markForCheck();
       },
@@ -173,6 +211,34 @@ export class ManagePortfolioPageComponent implements OnInit {
         this.cdr.markForCheck();
       },
     });
+  }
+
+  // ── Social Links Helpers ──────────────────────────────────
+
+  private createSocialLinkGroup(link?: SocialLink): FormGroup {
+    return this.fb.group({
+      platform: [link?.platform || 'linkedin', Validators.required],
+      url: [link?.url || '', Validators.required],
+      icon: [link?.icon || this.platformIcons['linkedin']],
+      sortOrder: [link?.sortOrder ?? this.socialLinksForm.length],
+    });
+  }
+
+  addSocialLink(): void {
+    this.socialLinksForm.push(this.createSocialLinkGroup());
+    this.cdr.markForCheck();
+  }
+
+  removeSocialLink(index: number): void {
+    this.socialLinksForm.removeAt(index);
+    this.cdr.markForCheck();
+  }
+
+  onPlatformChange(index: number): void {
+    const group = this.socialLinksForm.at(index) as FormGroup;
+    const platform = group.get('platform')?.value;
+    const icon = this.platformIcons[platform] || 'fa-solid fa-link';
+    group.patchValue({ icon });
   }
 
   /**
@@ -193,6 +259,7 @@ export class ManagePortfolioPageComponent implements OnInit {
       next: (updated: ProfileDto) => {
         this.currentProfile = updated;
         this.profileSaving = false;
+        this.portfolioService.invalidateCache();
         this.notification.success('Avatar uploaded');
         this.cdr.markForCheck();
       },
@@ -239,6 +306,7 @@ export class ManagePortfolioPageComponent implements OnInit {
       next: (updated: ProfileDto) => {
         this.currentProfile = updated;
         this.profileSaving = false;
+        this.portfolioService.invalidateCache();
         this.notification.success('Resume uploaded');
         this.cdr.markForCheck();
       },
@@ -377,6 +445,7 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.skillSaving = false;
           this.showSkillForm = false;
           this.editingSkill = null;
+          this.portfolioService.invalidateCache();
           this.notification.success('Skill updated');
           this.cdr.markForCheck();
         },
@@ -392,6 +461,7 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.skills = [...this.skills, created];
           this.skillSaving = false;
           this.showSkillForm = false;
+          this.portfolioService.invalidateCache();
           this.notification.success('Skill created');
           this.cdr.markForCheck();
         },
@@ -408,6 +478,7 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.adminService.deleteSkill(skill.id).subscribe({
       next: () => {
         this.skills = this.skills.filter(s => s.id !== skill.id);
+        this.portfolioService.invalidateCache();
         this.notification.success('Skill deleted');
         this.cdr.markForCheck();
       },
@@ -439,7 +510,7 @@ export class ManagePortfolioPageComponent implements OnInit {
   openAddExperience(): void {
     this.editingExperience = null;
     this.experienceForm.reset({
-      company: '', companyLogo: '', role: '', location: '',
+      company: '', companyLogo: '', position: '', location: '',
       startDate: '', endDate: '', isCurrent: false,
       description: '', technologies: '', sortOrder: 0,
     });
@@ -452,7 +523,7 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.experienceForm.patchValue({
       company: exp.company,
       companyLogo: exp.companyLogo || '',
-      role: exp.role,
+      position: exp.position,
       location: exp.location,
       startDate: exp.startDate,
       endDate: exp.endDate || '',
@@ -500,6 +571,7 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.experienceSaving = false;
           this.showExperienceForm = false;
           this.editingExperience = null;
+          this.portfolioService.invalidateCache();
           this.notification.success('Experience updated');
           this.cdr.markForCheck();
         },
@@ -515,6 +587,7 @@ export class ManagePortfolioPageComponent implements OnInit {
           this.experiences = [...this.experiences, created];
           this.experienceSaving = false;
           this.showExperienceForm = false;
+          this.portfolioService.invalidateCache();
           this.notification.success('Experience created');
           this.cdr.markForCheck();
         },
@@ -531,6 +604,7 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.adminService.deleteExperience(exp.id).subscribe({
       next: () => {
         this.experiences = this.experiences.filter(e => e.id !== exp.id);
+        this.portfolioService.invalidateCache();
         this.notification.success('Experience deleted');
         this.cdr.markForCheck();
       },
@@ -650,6 +724,7 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.projectSaving = false;
     this.showProjectForm = false;
     this.editingProject = null;
+    this.portfolioService.invalidateCache();
     this.notification.success('Project saved');
     this.loadProjects();
     this.cdr.markForCheck();
@@ -723,6 +798,7 @@ export class ManagePortfolioPageComponent implements OnInit {
     this.adminService.deleteProject(project.id).subscribe({
       next: () => {
         this.projects = this.projects.filter(p => p.id !== project.id);
+        this.portfolioService.invalidateCache();
         this.notification.success('Project deleted');
         this.cdr.markForCheck();
       },

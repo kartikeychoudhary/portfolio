@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
+import { Observable, of } from 'rxjs';
+import { tap } from 'rxjs/operators';
 import { ApiService } from '../../../core/services/api.service';
 import { ProfileDto } from '../../../core/models/profile.model';
 import { SkillDto } from '../../../core/models/skill.model';
@@ -10,20 +11,43 @@ import { EducationDto, ExperienceSummary } from '../../../core/models/education.
 
 /**
  * Service for fetching public portfolio data.
- * All methods call the API through the ApiService.
+ * Includes an in-memory expiring cache (5 min TTL) to avoid redundant API calls.
  */
 @Injectable({
   providedIn: 'root'
 })
 export class PortfolioService {
+  private cache = new Map<string, { data: any; timestamp: number }>();
+  private readonly CACHE_TTL = 5 * 60 * 1000; // 5 minutes
+
   constructor(private api: ApiService) {}
+
+  /**
+   * Returns cached data if available and not expired, otherwise fetches fresh data.
+   */
+  private getCached<T>(key: string, fetcher: () => Observable<T>): Observable<T> {
+    const cached = this.cache.get(key);
+    if (cached && (Date.now() - cached.timestamp) < this.CACHE_TTL) {
+      return of(cached.data as T);
+    }
+    return fetcher().pipe(
+      tap(data => this.cache.set(key, { data, timestamp: Date.now() }))
+    );
+  }
+
+  /**
+   * Clears all cached data. Call after admin save/delete operations.
+   */
+  invalidateCache(): void {
+    this.cache.clear();
+  }
 
   /**
    * Fetches the profile data including social links.
    * @returns Observable of ProfileDto
    */
   getProfile(): Observable<ProfileDto> {
-    return this.api.get<ProfileDto>('/profile');
+    return this.getCached('profile', () => this.api.get<ProfileDto>('/profile'));
   }
 
   /**
@@ -31,7 +55,7 @@ export class PortfolioService {
    * @returns Observable of SkillDto array
    */
   getSkills(): Observable<SkillDto[]> {
-    return this.api.get<SkillDto[]>('/skills');
+    return this.getCached('skills', () => this.api.get<SkillDto[]>('/skills'));
   }
 
   /**
@@ -39,7 +63,7 @@ export class PortfolioService {
    * @returns Observable of ExperienceDto array
    */
   getExperiences(): Observable<ExperienceDto[]> {
-    return this.api.get<ExperienceDto[]>('/experiences');
+    return this.getCached('experiences', () => this.api.get<ExperienceDto[]>('/experiences'));
   }
 
   /**
@@ -47,7 +71,7 @@ export class PortfolioService {
    * @returns Observable of ProjectDto array
    */
   getProjects(): Observable<ProjectDto[]> {
-    return this.api.get<ProjectDto[]>('/projects');
+    return this.getCached('projects', () => this.api.get<ProjectDto[]>('/projects'));
   }
 
   /**
